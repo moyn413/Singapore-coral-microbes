@@ -30,7 +30,7 @@ setwd("~/GitHub/Singapore-coral-microbes/nifH")
 ps <- readRDS("SG_nifH_phyloseq_cluster.rds")   #read RDS phyloseq file
 dataset_path <- "~/GitHub/Singapore-coral-microbes/nifH"
 path_dataset <- function(file_name) str_c(dataset_path, file_name)
-treefasta_dir <-    path_dataset("/nifH_ASVs/")
+treefasta_dir <-    path_dataset("/processed_nifH_ASVs/")
 
 
 #--------------------------------
