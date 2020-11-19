@@ -26,9 +26,9 @@ library(metagMisc)
 # Load phyloseq file
 #--------------------------------
 
-setwd("/Users/molly/Documents/GitHub/Singapore-coral-microbes/nifH")
+setwd("~/GitHub/Singapore-coral-microbes/nifH")
 ps <- readRDS("SG_nifH_phyloseq_cluster.rds")   #read RDS phyloseq file
-dataset_path <- "/Users/molly/Documents/GitHub/Singapore-coral-microbes/nifH"
+dataset_path <- "~/GitHub/Singapore-coral-microbes/nifH"
 path_dataset <- function(file_name) str_c(dataset_path, file_name)
 treefasta_dir <-    path_dataset("/nifH_ASVs/")
 
@@ -239,8 +239,8 @@ treemap.grid <- grid.arrange(goni.tree.dna.tissue, platyH.tree.dna.tissue, platy
 
 
 
-# ggsave("nifH_I-III_DNA_species_tissue_skeleton_order_clusterv2.pdf", plot = treemap.grid, 
-#        path = "/Users/molly/Dropbox/NitrogenFixation_Singapore/Manuscripts/August_experiment_manuscript/",
+# ggsave("nifH_I-III_DNA_species_tissue_skeleton_order_cluster.pdf", plot = treemap.grid, 
+#        path = "/path",
 #        width = 18,
 #        height = 10)
 
@@ -308,7 +308,7 @@ nfix.deseq <- ps_do_deseq(deseq.subset, 0.8) + ggtitle("all samples clusters I -
 
 
 # ggsave("deseq_all_nifH_I-III_DNA_order_nopocil.pdf", plot = nfix.deseq,
-#        path = "/Users/molly/Dropbox/NitrogenFixation_Singapore/Manuscripts/August_experiment_manuscript/",
+#        path = "/path",
 #        width = 10,
 #        height = 7)
 
@@ -336,7 +336,7 @@ sup.bar <- plot_bar(ps.top, fill="Cluster", x="Bars3") + facet_wrap(~Cluster, sc
   scale_fill_manual(values=c("#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02", "#a6761d", "#666666")) + scale_color_manual (values =c(values=c("#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02", "#a6761d", "#666666")))
 
 
-# ggsave("nifH_cluster_barplots_all2.pdf", plot =sup.bar, path = "/Users/molly/Dropbox/NitrogenFixation_Singapore/Manuscripts/August_experiment_manuscript/",
+# ggsave("nifH_cluster_barplots_all.pdf", plot =sup.bar, path = "/path",
 #        width = 15,
 #        height = 10)
 
@@ -364,7 +364,7 @@ sup.bar2 <- plot_bar(ps.top, fill="Class", x="Sample") + facet_wrap(NucleicType~
   theme(strip.text.x = element_text(size = 12))+ scale_color_manual(values=classPalette) + scale_fill_manual(values= classPalette)
 
 
-# ggsave("nifH_clusterI-III_barplots_Class2.pdf", plot =sup.bar2, path = "/Users/molly/Dropbox/NitrogenFixation_Singapore/Manuscripts/August_experiment_manuscript/overleaf",
+# ggsave("nifH_clusterI-III_barplots_Class.pdf", plot =sup.bar2, path = "/path",
 #        width = 10,
 #        height = 8)
 
@@ -400,7 +400,7 @@ ratios.nfix <- ggplot(nfix.glom.df, aes(x= DNA, y= RNA, colour=Class, label=Orde
   annotation_logticks(sides="lb")+  expand_limits(x = 100 ,y = 100)  +  scale_color_manual(values=classPalette)
 
 
-# ggsave("nifH_RNA_DNA.pdf", plot = ratios.nfix, path = "/Users/molly/Dropbox/NitrogenFixation_Singapore/Manuscripts/August_experiment_manuscript/",
+# ggsave("nifH_RNA_DNA.pdf", plot = ratios.nfix, path = "/path",
 #        width = 8,
 #        height = 6)
 # 
