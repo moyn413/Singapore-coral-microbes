@@ -18,7 +18,7 @@ Moynihan, M.A., Goodkin, N.F., Morgan, K.M., Kho, P.Y.Y, Lopes dos Santos, A., L
 ### 16S
 
 * fasta file with all 16S sequences ([SGcoral_16S_ASV.fasta](https://github.com/moyn413/Singapore-coral-microbes/blob/main/16S/SGcoral_16S_ASV.fasta))
-* 16S ASV table ([SGcoral_16S_dada2_ASV_table.tsv](https://github.com/moyn413/Singapore-coral-microbes/blob/main/16S/SGcoral_16S_ASV.fasta/SGcoral_16S_dada2_ASV_table.tsv))
+* 16S ASV table ([SGcoral_16S_dada2_ASV_table.tsv](https://github.com/moyn413/Singapore-coral-microbes/blob/main/16S/SGcoral_16S_dada2_ASV_table.tsv))
 * Phyloseq used to make figures ([SGcoral_16S_phyloseq.rds](https://github.com/moyn413/Singapore-coral-microbes/blob/main/16S/SGcoral_16S_phyloseq.rds))
 Rmd
 * R script used to process phyloseq and make figures ([SGcoral_16S_plots.R](https://github.com/moyn413/Singapore-coral-microbes/blob/main/16S/SGcoral_16S_plots.R))
