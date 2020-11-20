@@ -30,7 +30,7 @@ Rmd
 * fasta file with all 18S sequences ([SGcoral_18S_ASV.fasta](https://github.com/moyn413/Singapore-coral-microbes/blob/main/18S/SGcoral_18S_ASV.fasta))
 * 18S ASV table ([SGcoral_18S_dada2_ASV_table.tsv](https://github.com/moyn413/Singapore-coral-microbes/blob/main/18S/SGcoral_18S_dada2_ASV_table.tsv))
 * Phyloseq used to make figures ([SGcoral_18S_phyloseq.rds](https://github.com/moyn413/Singapore-coral-microbes/blob/main/18S/SGcoral_18S_phyloseq.rds))
-* R script used to process phyloseq and make figures [SGcoral_18S_plots.R](https://github.com/moyn413/Singapore-coral-microbes/blob/main/18S/SGcoral_18S_plots.R)
+* R script used to process phyloseq and make figures ([SGcoral_18S_plots.R](https://github.com/moyn413/Singapore-coral-microbes/blob/main/18S/SGcoral_18S_plots.R))
 
 
 
