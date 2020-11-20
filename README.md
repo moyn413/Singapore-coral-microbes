@@ -8,8 +8,6 @@ Moynihan, M.A., Goodkin, N.F., Morgan, K.M., Kho, P.Y.Y, Lopes dos Santos, A., L
 
 ### nifH
 
-https://github.com/moyn413/Singapore-coral-microbes/tree/main/nifH/
-
 * Newick and alignment files used to make nifH phylogeny based on protein alignment of select nifH sequences and reference sequences. Reference sequences in the tree are based on Meheust et al. 2020. ([SG_nifH_protein_tree_FINAL.newick](https://github.com/moyn413/Singapore-coral-microbes/tree/main/nifH/TREE-nifH_protein_phylogeny/SG_nifH_protein_tree_FINAL.newick ) & [SG_nifH_protein_alignment.fasta](https://github.com/moyn413/Singapore-coral-microbes/tree/main/nifH/TREE-nifH_protein_phylogeny/SG_nifH_protein_alignment.fasta))
 * fasta file with all nifH sequences ([SG_nifH_ASV.fasta](https://github.com/moyn413/Singapore-coral-microbes/tree/main/nifH/blast/SG_nifH_ASV.fasta))
 * ASV table, where nifH clusters, where manually assigned ([nifH_dada2_ASV_table_wClusters.tsv](https://github.com/moyn413/Singapore-coral-microbes/blob/main/nifH/nifH_dada2_ASV_table_wClusters.tsv))
