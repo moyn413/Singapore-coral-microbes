@@ -25,16 +25,12 @@ library(vegan)
 # Load phyloseq file
 #--------------------------------
 
-#CORAL16S_phyloseq_90_2.rds is file with updated cyanobacteria taxonomy based on NCBI database. 
-ps <- readRDS("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/16S/16S_August_coral_SW_plus_wneg_new_silva/dada2/CORAL16S_phyloseq_90_4.rds")   #read RDS phyloseq file
+#read RDS phyloseq file
+ps <- readRDS("/GitHub/Singapore-coral-microbes/16S/SGcoral_16S_phyloseq.rds")   
 
-# ps <- readRDS("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/16S/16S_August_coral_SW_plus_wneg/dada2/CORAL16S_phyloseq_90.rds")   #read RDS phyloseq file
-
-
-dataset_path <- "/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/16S/16S_August_coral_SW_plus_wneg_new_silva"
+dataset_path <- "/path"
 path_dataset <- function(file_name) str_c(dataset_path, file_name)
-dada2_dir <-  path_dataset("/dada2/")
-treefasta_dir <-path_dataset("/dada2/trees/fastafiles/")
+treefasta_dir <-path_dataset("/phyloseq tree files/")
 
 #--------------------------------
 # Remove contaminants    
@@ -47,11 +43,11 @@ contamdf.prev01 <- isContaminant(ps, method="prevalence", neg="is.neg", threshol
 table(contamdf.prev01$contaminant)
 which(contamdf.prev01$contaminant)    # 22 contaminants identified
 
-# remove contaminants
+# remove contaminants identified by decontam
 ps.noncontam <- prune_taxa(!contamdf.prev01$contaminant, ps) 
 
 #Remove samples uses as negative controls and SW samples used to balance decontam
-ps.augustsamples <-  ps.noncontam %>% subset_samples(Sample_or_Control != "Control") %>% subset_samples(Sample_or_Control != "noRT") %>% subset_samples(NucleicType != "decontam") 
+ps.augustsamples <-  ps.noncontam %>% subset_samples(Sample_or_Control != "Control") %>% subset_samples(NucleicType != "decontam") 
 
 #Remove eukaryote and chloroplast sequences. Subset taxa will remove NA so need to add exception for "or is NA"
 ps.august_noeuk <- subset_taxa(ps.augustsamples, Domain != "Eukaryota"| is.na(Domain)) #ntaxa= 15720
@@ -78,40 +74,35 @@ track
 
 
 #Export sequences as fasta files and inspect in Geneious Prime
-# seqs <- Biostrings::DNAStringSet(getSequences(refseq(ps.all.LO)))
-# Biostrings::writeXStringSet(seqs, str_c(treefasta_dir, "ALL_16S_ASV_LO.fasta"), compress = FALSE, width = 20000)
-# 
-
-
+seqs <- Biostrings::DNAStringSet(getSequences(refseq(ps.all.LO)))
+Biostrings::writeXStringSet(seqs, str_c(treefasta_dir, "ALL_16S_ASV_LO.fasta"), compress = FALSE, width = 20000)
+ 
 
 #Add Newick file made in Geneious Prime to phyloseq
-all.tree <- ape::read.tree("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/16S/16S_August_coral_SW_plus_wneg_new_silva/dada2/trees/phylo/ALL_16S_ASV_LO alignment FastTree Tree.newick")
+all.tree <- ape::read.tree("/phyloseq tree files/ALL_16S_ASV_LO alignment FastTree Tree.newick")
 
 #Add tree into phyloseq
-
 ps.all.LO.2 <- merge_phyloseq(ps.all.LO,all.tree)
 
-
-# Remove OTUs identified in Geneious Prime as being erroneous  
+#------------------------------------------------------------------------------------------------
+#Write function to remove remove OTUs identified in Geneious Prime as being erroneous  
 pop_taxa = function(physeq, badTaxa){
   allTaxa = taxa_names(physeq)
   allTaxa <- allTaxa[!(allTaxa %in% badTaxa)]
   return(prune_taxa(allTaxa, physeq))
 }
+#------------------------------------------------------------------------------------------------
 
 badTaxa = c("otu6504", "otu5256","otu7142", "otu3459")
 
 
-
+#Remove OTUs identified in Geneious Prime as being erroneous  
 ps.all.LO = pop_taxa(ps.all.LO.2, badTaxa)
 
 
 
 
 #------------------------------------------------------------------------------------------------
-
-
-
 ps_normalize_median <- function (ps, title) {
   ps_median = median(sample_sums(ps))
   cat(sprintf("\nThe median number of reads used for normalization of %s is  %.0f", title, ps_median))
@@ -126,11 +117,11 @@ ps_abundant <- function(ps,contrib_min=0.01, title){
   ps <- filter_taxa(ps, function(x) sum(x > total_per_sample*contrib_min) > 0, TRUE)
   ps <- ps_normalize_median(ps, title)
 }
+#------------------------------------------------------------------------------------------------
 
 
 # Normalize phyloseq files with low abundant OTUs (for diversity plots)
 ps.all.LR.norm = ps_normalize_median(ps.all.LR, "16S_all_LR_norm")
-
 
 # Normalize phyloseq file without low abundant OTUs
 ps.all.norm = ps_normalize_median(ps.all.LO, "16S_all_norm")
@@ -373,7 +364,7 @@ pcoa.plot1 <-plot_ordination(logt, out.pcoa.logt, type = "samples", shape = "Typ
   theme_bw() + ggtitle("PCOA coral DNA log transformed by SpeciesType")+ theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), panel.background = element_blank(), legend.text = element_text(size = 10))
 
 
-# ggsave("all_PCOA_all_ellipse.pdf", plot = pcoa.plot1,  path = "/Users/molly/Dropbox/NitrogenFixation_Singapore/Manuscripts/August_experiment_manuscript/overleaf_supplemental",
+# ggsave("all_PCOA_all_ellipse.pdf", plot = pcoa.plot1,  path = "/path",
 #        width = 8,
 #        height = 5)
 
@@ -416,7 +407,7 @@ platyH.pcoa1 <-plot_ordination(logt, out.pcoa.logt, color="Type", shape="Species
 pcoa.weighted  <- grid.arrange(platyH.pcoa1, goni.pcoa1, pocil.pcoa1, platyK.pcoa1,   nrow = 2)
 
 # 
-# ggsave("species_PCOA_unfrac_weighted_updated.pdf", plot = pcoa.weighted,  path = "/Users/molly/Dropbox/NitrogenFixation_Singapore/Manuscripts/August_experiment_manuscript/overleaf_v2",
+# ggsave("species_PCOA_unfrac_weighted_updated.pdf", plot = pcoa.weighted,  path = "/path",
 #        width = 8,
 #        height = 5)
 
@@ -520,7 +511,7 @@ finalplot_log <- ggplot(select.ratios2, aes(x= Ratio, y= factor(Phylum_Class_Ord
   scale_x_continuous(trans = 'log10') +
   annotation_logticks(sides="b") 
 
-# ggsave("select_RNA_DNA_ratios_byspecies_log.pdf", plot = finalplot_log, path = "/Users/molly/Dropbox/NitrogenFixation_Singapore/Manuscripts/August_experiment_manuscript/overleaf_supplemental",
+# ggsave("select_RNA_DNA_ratios_byspecies_log.pdf", plot = finalplot_log, path = "/path",
 #        width = 10,
 #        height = 9)
 
@@ -608,7 +599,7 @@ rna.skeleton.tree.order <- treemap_gg_dv2(long_skeleton_rna, Class, Order,"Coral
 x.order <-grid.arrange(dna.tissue.tree.order, dna.skeleton.tree.order, rna.tissue.tree.order, rna.skeleton.tree.order, nrow = 2)
 
 # ggsave("ST_DNA_RNA_treeplots_order_updated.pdf", plot = x.order,
-#        path = "/Users/molly/Dropbox/NitrogenFixation_Singapore/Manuscripts/August_experiment_manuscript/overleaf_supplemental",width = 10, height = 8)
+#        path = "/path",width = 10, height = 8)
 
 
 
@@ -659,7 +650,7 @@ long_SW <- ps_to_long_SW(ps.SW.norm)
 dna.tree.order <- treemap_gg_dv2(long_SW, Class, Order,"Seawater 16S DNA-based community", orderPalette)
 
 # ggsave("SW_16S_community.pdf", plot = dna.tree.order,
-#        path = "/Users/molly/Dropbox/NitrogenFixation_Singapore/Manuscripts/August_experiment_manuscript/overleaf_supplemental",
+#        path = "/path",
 #        width = 5,
 #        height = 5)
 
