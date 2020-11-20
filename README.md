@@ -13,7 +13,7 @@ Moynihan, M.A., Goodkin, N.F., Morgan, K.M., Kho, P.Y.Y, Lopes dos Santos, A., L
 * ASV table, where nifH clusters, where manually assigned ([nifH_dada2_ASV_table_wClusters.tsv](https://github.com/moyn413/Singapore-coral-microbes/blob/master/nifH_dada2_ASV_table_wClusters.tsv))
 * Newick and alignment files used to make nifH phylogeny based on protein alignment ([SG_nifH_protein_tree_FINAL.newick.tsv](https://github.com/moyn413/Singapore-coral-microbes/blob/master/TREE-nifH_protein_phylogeny/SG_nifH_protein_tree_FINAL.newick.tsv) & [SG_nifH_protein_alignment.fasta](https://github.com/moyn413/Singapore-coral-microbes/blob/master/TREE-nifH_protein_phylogeny/SG_nifH_protein_alignment.fasta))
 * Nucleotide based nifH fasta file ([SG_nifH_ASV.fasta](https://github.com/moyn413/Singapore-coral-microbes/blob/master/blast/SG_nifH_ASV.fasta))
-* Fasta files generated & used during phyloseq processing (processed_nifH_ASVs)
+* Fasta files generated & used during phyloseq processing ([processed_nifH_ASVs](https://github.com/moyn413/Singapore-coral-microbes/blob/master/processed_nifH_ASVs))
 
 ### 16S
 
