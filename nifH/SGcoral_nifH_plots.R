@@ -26,11 +26,10 @@ library(metagMisc)
 # Load phyloseq file
 #--------------------------------
 
-setwd("~/GitHub/Singapore-coral-microbes/nifH")
-ps <- readRDS("SG_nifH_phyloseq_cluster.rds")   #read RDS phyloseq file
-dataset_path <- "~/GitHub/Singapore-coral-microbes/nifH"
-path_dataset <- function(file_name) str_c(dataset_path, file_name)
-treefasta_dir <-    path_dataset("/processed_nifH_ASVs/")
+ps <- readRDS("/Users/molly/Documents/GitHub/Singapore-coral-microbes/nifH/SGcoral_nifH_phyloseq_cluster.rds")   #read RDS phyloseq file
+# dataset_path <- "~/GitHub/Singapore-coral-microbes/nifH"
+# path_dataset <- function(file_name) str_c(dataset_path, file_name)
+# treefasta_dir <-    path_dataset("/processed_nifH_ASVs/")
 
 
 #--------------------------------
@@ -51,38 +50,65 @@ ps.noncontam_noC <-  ps.noncontam %>% subset_samples(Sample_or_Control != "Contr
 
 #Rename main phyloseq
 ps.all <- ps.noncontam_noC
+ps.coral.all <-  ps.all %>% subset_samples(Type != "Seawater")
+ps.coral.dna <-  ps.coral.all %>% subset_samples(NucleicType == "DNA")  
+ps.coral.rna <-  ps.coral.all  %>% subset_samples(NucleicType == "RNA")
+ps.SW <-  ps.all %>% subset_samples(Type == "Seawater")
 
 # Remove samples with fewer than 20 reads 
 ps.all.LR <- prune_samples(sample_sums(ps.all)>=20, ps.all)
+ps.coral.all.LR <- prune_samples(sample_sums(ps.coral.all)>=20, ps.coral.all)
+ps.coral.dna.LR <- prune_samples(sample_sums(ps.coral.dna)>=20, ps.coral.dna)
+ps.coral.rna.LR <- prune_samples(sample_sums(ps.coral.rna)>=20, ps.coral.rna)
+ps.SW.LR <- prune_samples(sample_sums(ps.SW)>=20, ps.SW)
 
 # Remove OTUs occurring fewer than 10x
 ps.all.LO = prune_taxa(taxa_sums(ps.all.LR)>=10, ps.all.LR)
+ps.coral.all.LO <- prune_taxa(taxa_sums(ps.coral.all.LR)>=10, ps.coral.all.LR)
+ps.coral.dna.LO <- prune_taxa(taxa_sums(ps.coral.dna.LR)>=10, ps.coral.dna.LR)
+ps.coral.rna.LO <- prune_taxa(taxa_sums(ps.coral.rna.LR)>=10, ps.coral.rna.LR)
+ps.SW.LO <- prune_taxa(taxa_sums(ps.SW.LR)>=10, ps.SW.LR) 
 
-# Track number of OTUs removed 
-n.all <- ps.all.LR %>% prune_taxa(taxa_sums(ps.all.LR)>=1,.) %>% ntaxa(.)
-n.all.LO <-ntaxa(ps.all.LO)
-track <- cbind(n.all,n.all.LO)
-track
-
+#------------------------------------------------------------------------------------------------
 #Export sequences as fasta files and inspect in Geneious Prime
-seqs <- Biostrings::DNAStringSet(getSequences(refseq(ps.all.LO)))
-Biostrings::writeXStringSet(seqs, str_c(treefasta_dir, "ALL_nifH_ASV_LO.fasta"), compress = FALSE, width = 20000)
+# seqs <- Biostrings::DNAStringSet(getSequences(refseq(ps.all.LO)))
+# Biostrings::writeXStringSet(seqs, str_c(treefasta_dir, "ALL_nifH_ASV_LO.fasta"), compress = FALSE, width = 20000)
+# 
+# seqs <- Biostrings::DNAStringSet(getSequences(refseq(ps.coral.dna.LO)))
+# Biostrings::writeXStringSet(seqs, str_c(treefasta_dir, "CORALnifH_ASV_DNA_LO.fasta"), compress = FALSE, width = 20000)
+# 
+# seqs <- Biostrings::DNAStringSet(getSequences(refseq(ps.coral.rna.LO)))
+# Biostrings::writeXStringSet(seqs, str_c(treefasta_dir, "CORALnifH_ASV_RNA_LO.fasta"), compress = FALSE, width = 20000)
+# 
+# seqs <- Biostrings::DNAStringSet(getSequences(refseq(ps.SW.LO)))
+# Biostrings::writeXStringSet(seqs, str_c(treefasta_dir, "CORALnifH_ASV_SW_LO.fasta"), compress = FALSE, width = 20000)
 
 #Add Newick file made in Geneious Prime to phyloseq
-all.dna.tree <- ape::read.tree("/Users/molly/Documents/GitHub/Singapore-coral-microbes/nifH/nifH_ASVs/ALL_nifH_ASV_LO_alignment.newick")
+all.dna.tree <- ape::read.tree("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/nifH/nifH_August_coral_SW_plus/dada2_phylum/trees/ALL_nifH_ASV_LO alignment FastTree Tree.newick")
+coral.dna.tree <- ape::read.tree("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/nifH/nifH_August_coral_SW_plus/dada2_phylum/trees/CORALnifH_ASV_DNA_LO alignment FastTree Tree.newick")
+coral.rna.tree <- ape::read.tree("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/nifH/nifH_August_coral_SW_plus/dada2_phylum/trees/CORALnifH_ASV_RNA_LO alignment FastTree Tree.newick")
+SW.tree <- ape::read.tree("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/nifH/nifH_August_coral_SW_plus/dada2_phylum/trees/CORALnifH_ASV_SW_LO alignment FastTree Tree.newick")
 
+#------------------------------------------------------------------------------------------------
 ps.all.LO <- merge_phyloseq(ps.all.LO, all.dna.tree) 
+ps.coral.dna.LO <- merge_phyloseq(ps.coral.dna.LO, coral.dna.tree) 
+ps.coral.rna.LO <- merge_phyloseq(ps.coral.rna.LO, coral.rna.tree) 
+ps.SW.LO <- merge_phyloseq(ps.SW.LO, SW.tree) 
 
-# Remove OTUs identified in Geneious Prime as being erroneous  
+
+# Remove OTUs identified in Geneious Prime as being erroneous
 pop_taxa = function(physeq, badTaxa){
   allTaxa = taxa_names(physeq)
   allTaxa <- allTaxa[!(allTaxa %in% badTaxa)]
   return(prune_taxa(allTaxa, physeq))
 }
 
+# remove outlier OTUs
 badTaxa = c("otu2803", "otu1600", "otu3171")
-
 ps.all.LO = pop_taxa(ps.all.LO, badTaxa)
+ps.coral.dna.LO = pop_taxa(ps.coral.dna.LO, badTaxa)
+ps.coral.rna.LO = pop_taxa(ps.coral.rna.LO, badTaxa)
+ps.SW.LO = pop_taxa(ps.SW.LO, badTaxa)
 
 
 #------------------------------------------------------------------------------------------------
@@ -95,16 +121,23 @@ ps.nfix <- subset_taxa(ps.all.LO, Cluster !="Cluster V chL/bchL" & Cluster !="Cl
 #Make nfix phyloseq for coral DNA & RNA, coral DNA only, coral RNA only, and seawater 
 ps.nfix.coral <-ps.nfix %>% subset_samples(Type != "Seawater")
 ps.nfix.coral.dna <- ps.nfix.coral%>% subset_samples(NucleicType == "DNA")  
+ps.nfix.coral.rna <- ps.nfix.coral%>% subset_samples(NucleicType == "RNA")  
+ps.nfix.SW <-  ps.nfix %>% subset_samples(Type == "Seawater")
 
 #Reprune to remove any samples with 0s
 ps.nfix <- prune_samples(sample_sums(ps.nfix)>=1, ps.nfix)
 ps.nfix.coral <- prune_samples(sample_sums(ps.nfix.coral)>=1, ps.nfix.coral)
 ps.nfix.coral.dna <- prune_samples(sample_sums(ps.nfix.coral.dna)>=1, ps.nfix.coral.dna)
+ps.nfix.coral.rna <- prune_samples(sample_sums(ps.nfix.coral.rna)>=1, ps.nfix.coral.rna)
+ps.nfix.SW <- prune_samples(sample_sums(ps.nfix.SW)>=1, ps.nfix.SW)
 
 #Some otus will be 0 after this selection, so re-prune to remove zeros 
 ps.nfix <- prune_taxa(taxa_sums(ps.nfix)>=1, ps.nfix)
 ps.nfix.coral <- prune_taxa(taxa_sums(ps.nfix.coral)>=1, ps.nfix.coral)
 ps.nfix.coral.dna <- prune_taxa(taxa_sums(ps.nfix.coral.dna)>=1, ps.nfix.coral.dna)
+ps.nfix.coral.rna <- prune_taxa(taxa_sums(ps.nfix.coral.rna)>=1, ps.nfix.coral.rna)
+ps.nfix.SW <- prune_taxa(taxa_sums(ps.nfix.SW)>=1, ps.nfix.SW)
+
 
 
 #-----------Normalize functions------
@@ -126,20 +159,34 @@ ps_abundant <- function(ps,contrib_min=0.01, title){
 
 #-----------Normalize phyloseq with all clusters ---------------------------------
 
-# Normalize phyloseq with low abundant OTUs
+# Normalize phyloseq files with low abundant OTUs (for diversity plots)
 ps.all.LR.norm = ps_normalize_median(ps.all.LR, "nifH_all_LR_norm")
+ps.coral.all.LR.norm = ps_normalize_median(ps.coral.all.LR, "Coral_nifH_all_LR_norm")
+ps.coral.dna.LR.norm = ps_normalize_median(ps.coral.dna.LR, "Coral_nifH_dna_LR_norm")
+ps.coral.rna.LR.norm = ps_normalize_median(ps.coral.rna.LR, "Coral_nifH_rna_LR_norm")
+ps.SW.LR.norm = ps_normalize_median(ps.SW.LR, "SW_nifH_LR_norm")
 
 # Normalize phyloseq file without low abundant OTUs
 ps.all.norm = ps_normalize_median(ps.all.LO, "nifH_all_norm")
+ps.coral.all.norm = ps_normalize_median(ps.coral.all.LO, "Coral_nifH_all_norm")
+ps.coral.dna.norm = ps_normalize_median(ps.coral.dna.LO, "Coral_nifH_dna_norm")
+ps.coral.rna.norm = ps_normalize_median(ps.coral.rna.LO, "Coral_nifH_rna_norm")
+ps.SW.norm = ps_normalize_median(ps.SW.LO, "SW_nifH_norm")
 
 # Remove non-abundant taxa and normalize again
 ps.all.abund = ps_abundant(ps.all.norm,contrib_min=0.01, "nifH_all_abund")  
+ps.coral.all.abund = ps_abundant(ps.coral.all.norm,contrib_min=0.01, "Coral_nifH_all_abund")
+ps.coral.dna.abund = ps_abundant(ps.coral.dna.norm,contrib_min=0.01, "Coral_nifH_dna_abund")
+ps.coral.rna.abund = ps_abundant(ps.coral.rna.norm,contrib_min=0.01, "Coral_nifH_rna_abund")
+ps.SW.abund = ps_abundant(ps.SW.norm,contrib_min=0.01, "SW_nifH_abund") 
 
 
 #-----------Normalize phyloseq that have clusters I to III only ---------------------------------
 ps.nfix.norm  = ps_normalize_median(ps.nfix, "nifH_clusters_norm")
 ps.nfix.coral.norm  = ps_normalize_median(ps.nfix.coral, "Coral_nifH_clusters_norm")
 ps.nfix.coral.dna.norm = ps_normalize_median(ps.nfix.coral.dna, "Coral_nifH_clusters_dna_norm")
+ps.nfix.coral.rna.norm = ps_normalize_median(ps.nfix.coral.rna, "Coral_nifH_clusters_rna_norm")
+ps.nfix.SW.norm = ps_normalize_median(ps.nfix.SW, "SW_nifH_clusters_norm")
 
 
 
