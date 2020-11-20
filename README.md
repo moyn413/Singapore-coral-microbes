@@ -22,7 +22,7 @@ Moynihan, M.A., Goodkin, N.F., Morgan, K.M., Kho, P.Y.Y, Lopes dos Santos, A., L
 * Phyloseq used to make figures ([SGcoral_16S_phyloseq.rds](https://github.com/moyn413/Singapore-coral-microbes/blob/master/16S/SGcoral_16S_phyloseq.rds))
 Rmd
 * R script used to process phyloseq and make figures ([SGcoral_16S_plots.R](https://github.com/moyn413/Singapore-coral-microbes/blob/master/16S/SGcoral_16S_plots.R))
-* Files generated & used during phyloseq processing ([processed_16S_ASVs](https://github.com/moyn413/Singapore-coral-microbes/blob/master/16S/processed_16S_ASVs))
+* Files generated & used during phyloseq processing ([phyloseq tree files](https://github.com/moyn413/Singapore-coral-microbes/tree/main/16S/phyloseq%20tree%20files))
 * Plastid 16S sequences, phyloseq, ASV table, and script ([Plastids](https://github.com/moyn413/Singapore-coral-microbes/blob/master/16S/Plastids))
 
 ### 18S 
