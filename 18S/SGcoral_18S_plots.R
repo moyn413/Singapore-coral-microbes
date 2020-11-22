@@ -1,6 +1,5 @@
 #----------------------------------------------------------------
-# 18S  phyloseq processing file and script to make plots with nifH data. Starting file is a phyloseq file made using the dada2 pipeline.
-# For dada2 pipeline, see metabarcode_nifH_dada.R
+# 18S phyloseq processing file and script to make plots with 18S data. Starting file is a phyloseq file made using the dada2 pipeline.
 # Treemap, deseq, and normalization were based on scripts from https://github.com/slimelab/Singapore-metabarcodes
 #----------------------------------------------------------------
 library(plyr) 
