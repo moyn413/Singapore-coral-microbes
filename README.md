@@ -11,7 +11,6 @@ Moynihan, M.A., Goodkin, N.F., Morgan, K.M., Kho, P.Y.Y, Lopes dos Santos, A., L
 * Newick and alignment files used to make nifH phylogeny based on protein alignment of select nifH sequences and reference sequences. Reference sequences in the tree are based on Meheust et al. 2020. ([SGcoral_nifH_protein_tree.newick](https://github.com/moyn413/Singapore-coral-microbes/tree/main/nifH/nifH_protein_phylogeny/SGcoral_nifH_protein_tree.newick) & [SG_nifH_protein_alignment.fasta](https://github.com/moyn413/Singapore-coral-microbes/tree/main/nifH/nifH_protein_phylogeny/SGcoral_nifH_protein_alignment.fasta))
 * fasta file with all nifH sequences ([SGcoral_nifH_ASV.fasta](https://github.com/moyn413/Singapore-coral-microbes/blob/main/nifH/SG_nifH_ASV.fasta))
 * ASV table, where nifH clusters, where manually assigned ([SGcoral_nifH_dada2_ASV_table_wClusters.tsv](https://github.com/moyn413/Singapore-coral-microbes/blob/main/nifH/SGcoral_nifH_dada2_ASV_table_wClusters.tsv))
-
 * Phyloseq used to make figures ([SGcoral_nifH_phyloseq_cluster.rds](https://github.com/moyn413/Singapore-coral-microbes/blob/main/nifH/SGcoral_nifH_phyloseq_cluster.rds))
 * R script used to process phyloseq and make figures ([SGcoral_nifH_plots.R](https://github.com/moyn413/Singapore-coral-microbes/blob/main/nifH/SGcoral_nifH_plots.R))
 * Files generated & used during phyloseq processing ([phyloseq tree files](https://github.com/moyn413/Singapore-coral-microbes/tree/main/nifH/phyloseq%20tree%20files))
