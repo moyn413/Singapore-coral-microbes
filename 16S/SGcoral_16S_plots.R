@@ -24,12 +24,12 @@ library(vegan)
 # Load phyloseq file
 #--------------------------------
 
-ps <- readRDS("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/16S/16S_August_coral_SW_plus_wneg_new_silva/dada2/CORAL16S_phyloseq_90_github.rds")   #read RDS phyloseq file
+ps <- readRDS("/GitHub/Singapore-coral-microbes/16S/SGcoral_16S_phyloseq.rds")   #read RDS phyloseq file
 
-dataset_path <- "/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/16S/16S_August_coral_SW_plus_wneg_new_silva"
+dataset_path <- "/GitHub/Singapore-coral-microbes/16S/"
 path_dataset <- function(file_name) str_c(dataset_path, file_name)
-dada2_dir <-  path_dataset("/dada2/")
-treefasta_dir <-path_dataset("/dada2/trees/fastafiles/")
+#dada2_dir <-  path_dataset("/16S/")
+treefasta_dir <-path_dataset("/16S/phyloseq tree files/")
 
 #--------------------------------
 # Remove contaminants    
