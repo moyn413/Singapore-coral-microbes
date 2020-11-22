@@ -25,7 +25,8 @@ library(vegan)
 # Load phyloseq file
 #--------------------------------
 
-ps <- readRDS("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/18S/18S_August_coral_SW/dada2/CORAL18S_phyloseq_90_v2_github.rds")   #read RDS phyloseq file
+
+ps <- readRDS("/GitHub/Singapore-coral-microbes/18S/SGcoral_18S_phyloseq.rds")   #read RDS phyloseq file
 
 #--------------------------------
 # Remove contaminants    
