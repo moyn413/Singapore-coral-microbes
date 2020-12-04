@@ -289,8 +289,8 @@ dna.skeleton.tree.order <- treemap_gg_dv2(long_skeleton_dna, Class, Order,"Coral
 
 
 # Compare tissue/skeleton RNA
-rna.tissue.tree.order <- treemap_gg_dv2(long_tissue_rna, Class, Order ,"Coral 16S rRNA community -  Tissue RNA samples", orderPalette)
-rna.skeleton.tree.order <- treemap_gg_dv2(long_skeleton_rna, Class, Order,"Coral 16S rRNA community - Skeleton RNA samples", orderPalette)
+rna.tissue.tree.order <- treemap_gg_dv2(long_tissue_rna, Class, Order ,"Coral 18S rRNA community -  Tissue RNA samples", orderPalette)
+rna.skeleton.tree.order <- treemap_gg_dv2(long_skeleton_rna, Class, Order,"Coral 18S rRNA community - Skeleton RNA samples", orderPalette)
 
 
 # Combine DNA and RNA community plots
