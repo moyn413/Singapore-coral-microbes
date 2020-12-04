@@ -24,7 +24,7 @@ library(RColorBrewer)
 #--------------------------------
 
 
-ps <- readRDS("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/16S/16S_August_coral_SW_plus_wneg_new_silva/dada2/16S_chloroplast_plastid_PR2database/CORAL16S_phyloseq_chloroplast_90_github.rds")   #read RDS phyloseq file
+ps <- readRDS("/GitHub/Singapore-coral-microbes/16S/Plastids/SG_16S_Plastid_phyloseq.rds")   #read RDS phyloseq file
 
 
 #--------------------------------
