@@ -333,14 +333,14 @@ ps_do_deseq <- function(deseq_data, a){
   g <- ggplot(sigtab, aes(x=Order, y=log2FoldChange, color=Class)) + geom_point(size=6) + 
     theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5))+   
     ylab("log2 fold change - Skeleton <--> Tissue") +
-    scale_colour_manual(values=getPalette) +  coord_flip() + theme_bw() +  theme(axis.text.x = element_text(size = 10),
-                                                                                 axis.title.x =element_text(size=10),
-                                                                                 axis.text.y = element_text(size = 10 ),
-                                                                                 legend.title = element_text(size = 10),
-                                                                                 legend.text = element_text(size = 10))
-  
+    scale_colour_manual(values=getPalette) +  coord_flip() + theme_bw() +  
+    theme(axis.text.x = element_text(size = 10),
+          axis.title.x =element_text(size=10),
+          axis.text.y = element_text(size = 10 ),
+          legend.title = element_text(size = 10),
+          legend.text = element_text(size = 10)) + 
+          scale_y_continuous(limits = c(-7,7))   # Changed scale here to balance plot y-axis around 0, but one outlier does not fit in this new scale. Saved outlier information and inserted seperately using Illustrator for final plot. To see all values, remove the scale_y_continuous term here.
   return(g)
-  
 }
 
 
