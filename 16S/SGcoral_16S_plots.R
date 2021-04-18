@@ -433,47 +433,38 @@ pcoa.weighted  <- grid.arrange(platyH.pcoa1, goni.pcoa1, pocil.pcoa1, platyK.pco
 
 
 ##---------------------------------------------------------------------
-# Figure 7. RNA:DNA ratio plot
+# Figure 7a. RNA:DNA ratio plot
 ##---------------------------------------------------------------------
 
-
-#Make subsets for each species (includind RNA and DNA)
+#Subset each coral/site (with both RNA and DNA)
 pocil <- subset_samples(ps.coral.all.norm, Species2=="K_Pocil")
 platyK <- subset_samples(ps.coral.all.norm, Species2=="K_Platy")
 platyH <- subset_samples(ps.coral.all.norm, Species2=="H_Platy")
 goni <- subset_samples(ps.coral.all.norm, Species2=="H_Goni")
 
-#Agglomerate to the order level
-pocil.glom <- tax_glom(pocil, taxrank="Order", NArm=TRUE)
-platyK.glom <- tax_glom(platyK, taxrank="Order", NArm=TRUE)
-platyH.glom <- tax_glom(platyH, taxrank="Order", NArm=TRUE)
-goni.glom <- tax_glom(goni, taxrank="Order", NArm=TRUE)
-
 #Normalize
-pocil.glom.norm <- ps_normalize_median(pocil.glom, "merged_pocil_norm")
-platyK.glom.norm <- ps_normalize_median(platyK.glom, "merged_platyK_norm")
-platyH.glom.norm <- ps_normalize_median(platyH.glom, "merged_platyH_norm")
-goni.glom.norm <- ps_normalize_median(goni.glom, "merged_goniH_norm")
+pocil.norm <- ps_normalize_median(pocil, "merged_pocil_norm")
+platyK.norm <- ps_normalize_median(platyK, "merged_platyK_norm")
+platyH.norm <- ps_normalize_median(platyH, "merged_platyH_norm")
+goni.norm <- ps_normalize_median(goni, "merged_goniH_norm")
 
-#Merge DNA replicates, merge RNA replicates
-pocil.merge <- merge_samples(pocil.glom.norm, "Type")  
-platyK.merge <- merge_samples(platyK.glom.norm, "Type")  
-platyH.merge <- merge_samples(platyH.glom.norm, "Type")  
-goni.merge <- merge_samples(goni.glom.norm, "Type")  
+#Merge samples of the same coral/site/type
+pocil.merge <- merge_samples(pocil.norm, "Type")  
+platyK.merge <- merge_samples(platyK.norm, "Type")  
+platyH.merge <- merge_samples(platyH.norm, "Type")  
+goni.merge <- merge_samples(goni.norm, "Type")  
 
-#Normalize again
+#Normalize merged samples
 pocil.merge.norm <- ps_normalize_median(pocil.merge, "merged_pocil_norm")  
 platyK.merge.norm <- ps_normalize_median(platyK.merge, "merged_platyK_norm")  
 platyH.merge.norm <- ps_normalize_median(platyH.merge, "merged_platyH_norm")  
 goni.merge.norm <- ps_normalize_median(goni.merge, "merged_goniH_norm")  
-
 
 #Convert otu table to dataframe
 pocil.df <-phyloseq_to_df(pocil.merge.norm, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
 platyK.df <-phyloseq_to_df(platyK.merge.norm, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
 platyH.df <-phyloseq_to_df(platyH.merge.norm, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
 goni.df <-phyloseq_to_df(goni.merge.norm, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
-
 
 #Calculate RNA/DNA ratios
 pocil.df <- transform(pocil.df, T_ratio = Tissue_R /Tissue, S_ratio=Skeleton_R/Skeleton)
@@ -485,55 +476,156 @@ goni.df <- transform(goni.df, T_ratio = Tissue_R /Tissue, S_ratio=Skeleton_R/Ske
 #Reorganize dataframe to faclitate plot_bar
 #----------------------------------------------------------------------------------------------------------------------
 #------Pocillopora-------#
-pocil.df.S <- as_tibble(pocil.df) %>% select(Phylum, Class, Order, Skeleton, Skeleton_R, S_ratio)%>% transform(., Type="Skeleton", Coral="Kusu Pocillopora")%>% dplyr::rename(DNA=Skeleton, RNA=Skeleton_R, Ratio=S_ratio)
-pocil.df.T <- pocil.df %>% select(Phylum, Class, Order,Tissue, Tissue_R, T_ratio)%>% transform(., Type="Tissue", Coral="Kusu Pocillopora")%>% dplyr::rename(DNA=Tissue, RNA=Tissue_R, Ratio=T_ratio)
+pocil.df.S <- as_tibble(pocil.df) %>% select(OTU,Phylum, Class, Order, Skeleton, Skeleton_R, S_ratio)%>% transform(., Type="Skeleton", Coral="Kusu Pocillopora")%>% 
+  dplyr::rename(DNA=Skeleton, RNA=Skeleton_R, Ratio=S_ratio)%>% unite("CoralType", c(Coral,Type) ,remove = FALSE)
+
+pocil.df.T <- pocil.df %>% select(OTU,Phylum, Class, Order,Tissue, Tissue_R, T_ratio)%>% transform(., Type="Tissue", Coral="Kusu Pocillopora")%>% 
+  dplyr::rename(DNA=Tissue, RNA=Tissue_R, Ratio=T_ratio)%>% unite("CoralType", c(Coral,Type),remove = FALSE)
+
 pocil.df2 <-as_tibble(rbind(pocil.df.T, pocil.df.S))%>%na.omit()
 #----------------------------------------------------------------------------------------------------------------------
 #------Platygyra Kusu-------#
-platyK.df.S <- as_tibble(platyK.df) %>% select(Phylum, Class, Order, Skeleton, Skeleton_R, S_ratio)%>% transform(., Type="Skeleton", Coral="Kusu Platgyra")%>% dplyr::rename(DNA=Skeleton, RNA=Skeleton_R, Ratio=S_ratio)
-platyK.df.T <- platyK.df %>% select(Phylum, Class, Order,Tissue, Tissue_R, T_ratio)%>% transform(., Type="Tissue", Coral="Kusu Platgyra")%>% dplyr::rename(DNA=Tissue, RNA=Tissue_R, Ratio=T_ratio)
+platyK.df.S <- as_tibble(platyK.df) %>% select(OTU,Phylum, Class, Order, Skeleton, Skeleton_R, S_ratio)%>% transform(., Type="Skeleton", Coral="Kusu Platygyra")%>%
+  dplyr::rename(DNA=Skeleton, RNA=Skeleton_R, Ratio=S_ratio)%>% unite("CoralType", c(Coral,Type),remove = FALSE)
+
+platyK.df.T <- platyK.df %>% select(OTU,Phylum, Class, Order,Tissue, Tissue_R, T_ratio)%>% transform(., Type="Tissue", Coral="Kusu Platygyra")%>% 
+  dplyr::rename(DNA=Tissue, RNA=Tissue_R, Ratio=T_ratio)%>% unite("CoralType", c(Coral,Type),remove = FALSE)
+
 platyK.df2 <-as_tibble(rbind(platyK.df.T, platyK.df.S))%>%na.omit()
 #----------------------------------------------------------------------------------------------------------------------
 #------Platygyra Hantu-------#
-platyH.df.S <- as_tibble(platyH.df) %>% select(Phylum, Class, Order, Skeleton, Skeleton_R, S_ratio)%>% transform(., Type="Skeleton", Coral="Hantu Platgyra")%>% dplyr::rename(DNA=Skeleton, RNA=Skeleton_R, Ratio=S_ratio)
-platyH.df.T <- platyH.df %>% select(Phylum, Class, Order,Tissue, Tissue_R, T_ratio)%>% transform(., Type="Tissue", Coral="Hantu Platgyra")%>% dplyr::rename(DNA=Tissue, RNA=Tissue_R, Ratio=T_ratio)
+platyH.df.S <- as_tibble(platyH.df) %>% select(OTU, Phylum, Class, Order, Skeleton, Skeleton_R, S_ratio)%>% transform(., Type="Skeleton", Coral="Hantu Platygyra")%>% 
+  dplyr::rename(DNA=Skeleton, RNA=Skeleton_R, Ratio=S_ratio)%>% unite("CoralType", c(Coral,Type),remove = FALSE)
+
+platyH.df.T <- platyH.df %>% select(OTU,Phylum, Class, Order,Tissue, Tissue_R, T_ratio)%>% transform(., Type="Tissue", Coral="Hantu Platygyra")%>% 
+  dplyr::rename(DNA=Tissue, RNA=Tissue_R, Ratio=T_ratio)%>% unite("CoralType", c(Coral,Type),remove = FALSE)
+
 platyH.df2 <-as_tibble(rbind(platyH.df.T, platyH.df.S))%>%na.omit()
 #----------------------------------------------------------------------------------------------------------------------
 #------Goniopora-------#
-goni.df.S <- as_tibble(goni.df) %>% select(Phylum, Class, Order, Skeleton, Skeleton_R, S_ratio)%>% transform(., Type="Skeleton", Coral="Hantu Goniopora")%>% dplyr::rename(DNA=Skeleton, RNA=Skeleton_R, Ratio=S_ratio)
-goni.df.T <- goni.df %>% select(Phylum, Class, Order,Tissue, Tissue_R, T_ratio)%>% transform(., Type="Tissue", Coral="Hantu Goniopora")%>% dplyr::rename(DNA=Tissue, RNA=Tissue_R, Ratio=T_ratio)
+goni.df.S <- as_tibble(goni.df) %>% select(OTU,Phylum, Class, Order, Skeleton, Skeleton_R, S_ratio)%>% transform(., Type="Skeleton", Coral="Hantu Goniopora")%>%
+  dplyr::rename(DNA=Skeleton, RNA=Skeleton_R, Ratio=S_ratio)%>% unite("CoralType", c(Coral,Type),remove = FALSE)
+
+goni.df.T <- goni.df %>% select(OTU,Phylum, Class, Order,Tissue, Tissue_R, T_ratio)%>% transform(., Type="Tissue", Coral="Hantu Goniopora")%>% 
+  dplyr::rename(DNA=Tissue, RNA=Tissue_R, Ratio=T_ratio)%>% unite("CoralType", c(Coral,Type),remove = FALSE)
+
 goni.df2 <-as_tibble(rbind(goni.df.T, goni.df.S))%>%na.omit()
 #----------------------------------------------------------------------------------------------------------------------
 
-#Combine dataframes 
+#Merge dataframes
 all.coral.ratios <- as_tibble(rbind(goni.df2, platyH.df2,platyK.df2,pocil.df2))
 
 #----------------------------------------------------------------------------------------------------------------------------
 
-#Select orders that were identified in nifH analysis
-select.ratios <- filter(all.coral.ratios, Order == "Synechococcales" | Order == "Oscillatoriales" | Order == "Chroococcales" | Order =="Pleurocapsales" | Order =="Chrococcales" | Order =="Nostocales" |
-                          Order =="Caldilineales" | Order =="Ardenticatenales" | Order == "Anaerolineales"| Order =="Chloroflexales" | Order =="SAR202 clade" |  Order =="SBR1031" |
-                          Order =="Oceanospirillales" | Order =="Alteromonadales" | Order =="Thiotrichales" | Order == "Vibrionales" | Order =="Nitrosococcales"| Order =="Chromatiales" | 
-                          Order =="Kiloniellales" | Order =="Rhodospirillales" | Order == "Rhizobiales" | Order == "Rhodobacterales" | Order== "Desulfobacterales" | Order == "Desulfobulbales" | 
-                          Order =="Desulfovibrionales" | Order == "Syntrophobacterales" |  Class == "Nitrospiria" )
+#Select subset of taxa
+select.ratios <- filter(all.coral.ratios, Order == "Propionibacteriales"| Order == "Bacteroidales"| Order == "Campylobacterales" | 
+                                   Order == "Anaerolineales"| Order =="Ardenticatenales"| Order =="Caldilineales"| Order =="SBR1031" | 
+                                   Order =="Chloroflexales" | Order =="SAR202 clade" |  Order == "Chroococcales" | Order =="Nostocales"| 
+                                   Order == "Oscillatoriales" | Order =="Pleurocapsales"  | Order == "Synechococcales" | 
+                                   Order== "Desulfarculales"| Order== "Desulfobacterales"  | Order == "Desulfobulbales" | Order =="Desulfovibrionales" | 
+                                   Order== "Clostridiales"| Order =="Kiloniellales" | Order == "Rhizobiales" | Order == "Rhodobacterales" | 
+                                   Order =="Rhodospirillales" | Order == "Burkholderiales" | Order =="Alteromonadales" | Order =="Chromatiales" | 
+                                   Order =="Oceanospirillales" | Order == "Pseudomonadales"| Order =="Thiotrichales" | Order == "Vibrionales" | 
+                                   Order == "Verrucomicrobiales")
 
-# Save as CSV files 
-# write.csv(select.ratios, file = "/Users/molly/Dropbox/NitrogenFixation_Singapore/Manuscripts/August_experiment_manuscript/overleaf_supplemental/select_RNA_DNA_ratios_byspecies.csv")
-# select.ratios.test <- filter(all.coral.ratios, Order == "Synechococcales" | Order == "Oscillatoriales" | Order == "Chroococcales" | Order =="Pleurocapsales" )
+#Create column with merged taxonomic information "phyum, class, order" to facilitate plot organization on the y-axis
+select.ratios.new <- unite(select.ratios, "Phylum_Class_Order", Phylum:Class:Order, sep = "_",  remove = FALSE )
 
-#Make new column with taxonomic ranks combined, so that samples will be sorted in a logical order on the y-axis
-select.ratios2 <- unite(select.ratios, "Phylum_Class_Order", Phylum:Class:Order,sep = "_",  remove = FALSE )
+#Remove infinity, 0 and NaN values, to only look at OTUs present in both RNA and DNA 
+select.ratios.new[select.ratios.new == Inf] <- NA #remove samples where not in DNA
+select.ratios.new[select.ratios.new == "NaN"] <- NA  #remove NaN samples
+select.ratios.new[select.ratios.new == 0] <- NA  #remove samples where not in RNA
 
-finalplot_log <- ggplot(select.ratios2, aes(x= Ratio, y= factor(Phylum_Class_Order, levels=rev(levels(factor(Phylum_Class_Order)))), shape=Coral, fill = factor(Type)))+
+#Average and standard error of OTU ratios, averaged by taxonomic Order, in each species/compartment/site
+avg.ratios <- select.ratios.new %>% group_by(Order,CoralType, Coral, Type,Phylum_Class_Order) %>% summarize(RNADNA=mean(Ratio,na.rm = TRUE), sd=sd(Ratio,na.rm = TRUE), n=n())
+avg.ratios<- avg.ratios%>% mutate(., se=(sd/sqrt(n)))
+
+#Plot average and standard error of RNA:DNA for OTUs within given taxonomic Order for each species/site/compartment
+finalplot_log_revised <- ggplot(avg.ratios, aes(x= RNADNA, y= factor(Phylum_Class_Order, levels=rev(levels(factor(Phylum_Class_Order)))), shape=Coral, fill = factor(Type)))+
   geom_point(size = 3) +  scale_shape_manual(values=c(22, 24, 25,21))+
   scale_fill_manual(values=c("#fee08b", "#8073ac"))+
-  theme_bw() +  ggtitle("RNA:DNA")+ xlab("log RNA:DNA ratio") + ylab("Order") +
-  scale_x_continuous(trans = 'log10') +
-  annotation_logticks(sides="b") 
+  theme_bw() +  ggtitle("RNA:DNA")+ xlab("log10 RNA:DNA ratio") + ylab("Order") +
+  annotation_logticks(sides="b") + scale_x_continuous(trans = 'log10') +
+  geom_errorbarh(aes(y=Phylum_Class_Order, x= RNADNA, xmin=RNADNA-se, xmax=RNADNA+se), position = "dodge", height=0, size=0.07, color="black", na.rm = TRUE) 
 
-# ggsave("select_RNA_DNA_ratios_byspecies_log.pdf", plot = finalplot_log, path = "/path",
+#Save plot
+# ggsave("select_RNA_DNA_ratios_byspecies_log_v2.pdf", plot = finalplot_log, path = "/path",
 #        width = 10,
 #        height = 9)
+
+
+##---------------------------------------------------------------------
+# Figure 7b. RNA:DNA Scatter plots with selected OTUs in the tissue and skeleton
+##---------------------------------------------------------------------
+
+#Make custom color palette for the class level
+getPalette = colorRampPalette(c(brewer.pal(8, "Set1"),brewer.pal(8, "Set2"),brewer.pal(12, "Set3"))) 
+classList = unique(select.ratios.new$Class)
+classPalette = getPalette(length(classList))
+names(classPalette) = classList
+
+tissue.scatter <- select.ratios.new %>% filter(Type== "Tissue")
+skeleton.scatter <- select.ratios.new %>% filter(Type== "Skeleton")
+
+p1 <- ggplot(tissue.scatter, aes(x= DNA, y= RNA, colour=Class, label=Class, group = Class))+
+  geom_point(size = 3) + 
+  #  geom_text(aes(label=Class),hjust=0, vjust=0) + 
+  geom_abline(intercept = 0) +
+  theme_bw() +  ggtitle("RNA:DNA in tissue")+
+  scale_x_continuous(trans = 'log10') + 
+  scale_y_continuous(trans = 'log10')+
+  annotation_logticks(sides="lb")+  expand_limits(x = 100 ,y = 1000)  + scale_color_manual(values=classPalette)
+
+p2 <- ggplot(skeleton.scatter, aes(x= DNA, y= RNA, colour=Class, label=Class, group=Class))+
+  geom_point(size = 3) + 
+  #geom_text(aes(label=Order),hjust=0, vjust=0) + 
+  geom_abline(intercept = 0) +
+  theme_bw() +  ggtitle("RNA:DNA in skeleton")+
+  scale_x_continuous(trans = 'log10') + 
+  scale_y_continuous(trans = 'log10')+
+  annotation_logticks(sides="lb")+  expand_limits(x = 100 ,y = 1000)  +  scale_color_manual(values=classPalette) 
+
+x <-grid.arrange(p1,p2, nrow = 2)
+
+#Save plot
+# ggsave("T_S_DNA_RNA_scatter_byOTU_v2.pdf", plot = finalplot_log, path = "/path",
+#        width = 7,
+#        height = 8)
+
+
+#--------Remove alpha and gammaproteobacteria from the plots above and replot--------#
+
+skeleton.scatter_noAG <- select.ratios.new %>% filter(Type== "Skeleton") %>% filter(Class != "Alphaproteobacteria" & Class != "Gammaproteobacteria")
+tissue.scatter_noAG <- select.ratios.new %>% filter(Type== "Tissue") %>% filter(Class != "Alphaproteobacteria" & Class != "Gammaproteobacteria")
+
+p3 <- ggplot(tissue.scatter_noAG, aes(x= DNA, y= RNA, colour=Class, label=Class, group = Class))+
+  geom_point(size = 3) + 
+  #geom_text(aes(label=Order),hjust=0, vjust=0) + 
+  geom_abline(intercept = 0) + 
+  theme_bw() +  ggtitle("RNA:DNA in tissue")+
+  scale_x_continuous(trans = 'log10') + 
+  scale_y_continuous(trans = 'log10')+
+  annotation_logticks(sides="lb")+  expand_limits(x = 100 ,y = 100)  + scale_color_manual(values=classPalette)
+
+p4 <- ggplot(skeleton.scatter_noAG, aes(x= DNA, y= RNA, colour=Class, label=Class, group = Class))+
+  geom_point(size = 3) +
+  #geom_text(aes(label=Order),hjust=0, vjust=0) + 
+  geom_abline(intercept = 0) +
+  theme_bw() +  ggtitle("RNA:DNA in skeleton")+
+  scale_x_continuous(trans = 'log10') + 
+  scale_y_continuous(trans = 'log10')+
+  annotation_logticks(sides="lb")+  expand_limits(x = 1000 ,y = 1000)  +  scale_color_manual(values=classPalette) 
+
+x <-grid.arrange(p3,p4, nrow = 2)
+
+#Save plot
+# ggsave("T_S_DNA_RNA_scatter_byOTU_noalphagamma_v2.pdf", plot = finalplot_log, path = "/path",
+#        width = 7,
+#        height = 8)
+
+
+
+
 
 
 
