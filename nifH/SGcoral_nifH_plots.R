@@ -201,7 +201,6 @@ ps.nfix.SW.norm = ps_normalize_median(ps.nfix.SW, "SW_nifH_clusters_norm")
 #------------------------------------------------------------------------------------------------
 
 
-
 #-----Functions for treemap--------#
 ps_to_long <- function(ps) {
   otu_df <- data.frame(otu_table(ps)) %>% 
@@ -241,25 +240,38 @@ treemap_gg_dv2 <- function(df, group1, group2, title, c.palette) {
 
 
 
-
 #-----Make ps_to_long for each species/type (tissue/skeleton/site) of Cluster I - III only--------#
+#Platygyra Kusu tissue, replace NA with "unknown Order"
 platyK.dna.tissue <- subset_samples(ps.nfix.coral.dna.norm, Species=="K_Platy" & Type == "Tissue")
-platyK.dna2.tissue <- ps_to_long(platyK.dna.tissue)
+platyK.dna2.tissue <- ps_to_long(platyK.dna.tissue)%>% replace_na(list(Order= "unknown Order"))
+
+#Platygyra Hantu tissue, replace NA with "unknown Order"
 platyH.dna.tissue <- subset_samples(ps.nfix.coral.dna.norm, Species=="H_Platy" & Type == "Tissue")
-platyH.dna2.tissue <- ps_to_long(platyH.dna.tissue)
+platyH.dna2.tissue <- ps_to_long(platyH.dna.tissue)%>% replace_na(list(Order= "unknown Order"))
+
+#Goniopora Hantu tissue, replace NA with "unknown Order"
 goni.dna.tissue <- subset_samples(ps.nfix.coral.dna.norm, Species=="H_Goni" & Type == "Tissue")
-goni.dna2.tissue <- ps_to_long(goni.dna.tissue)
+goni.dna2.tissue <- ps_to_long(goni.dna.tissue)%>% replace_na(list(Order= "unknown Order"))
 
+#Pocillopora Kusu skeleton, replace NA with "unknown Order"
 pocil.dna.skeleton <- subset_samples(ps.nfix.coral.dna.norm, Species=="K_Pocil" & Type == "Skeleton")
-pocil.dna2.skeleton <- ps_to_long(pocil.dna.skeleton)
-platyK.dna.skeleton <- subset_samples(ps.nfix.coral.dna.norm, Species=="K_Platy" & Type == "Skeleton")
-platyK.dna2.skeleton <- ps_to_long(platyK.dna.skeleton)
-platyH.dna.skeleton <- subset_samples(ps.nfix.coral.dna.norm, Species=="H_Platy" & Type == "Skeleton")
-platyH.dna2.skeleton <- ps_to_long(platyH.dna.skeleton)
-goni.dna.skeleton <- subset_samples(ps.nfix.coral.dna.norm, Species=="H_Goni" & Type == "Skeleton")
-goni.dna2.skeleton <- ps_to_long(goni.dna.skeleton)
+pocil.dna2.skeleton <- ps_to_long(pocil.dna.skeleton)%>% replace_na(list(Order= "unknown Order"))
 
-#-----Make custom color palette for treemap--------#
+#Platygyra Kusu skeleton, replace NA with "unknown Order"
+platyK.dna.skeleton <- subset_samples(ps.nfix.coral.dna.norm, Species=="K_Platy" & Type == "Skeleton")
+platyK.dna2.skeleton <- ps_to_long(platyK.dna.skeleton)%>% replace_na(list(Order= "unknown Order"))
+
+#Platygyra Hantu skeleton, replace NA with "unknown Order"
+platyH.dna.skeleton <- subset_samples(ps.nfix.coral.dna.norm, Species=="H_Platy" & Type == "Skeleton")
+platyH.dna2.skeleton <- ps_to_long(platyH.dna.skeleton)%>% replace_na(list(Order= "unknown Order"))
+
+#Goniopora Hantu skeleton, replace NA with "unknown Order"
+goni.dna.skeleton <- subset_samples(ps.nfix.coral.dna.norm, Species=="H_Goni" & Type == "Skeleton")
+goni.dna2.skeleton <- ps_to_long(goni.dna.skeleton)%>% replace_na(list(Order= "unknown Order"))
+
+
+
+#-----Make color palette for treemap--------#
 getPalette = colorRampPalette(c(brewer.pal(8, "Dark2"), brewer.pal(12, "Paired"))) 
 orderList = unique(tax_table(ps.nfix.coral.norm)[,"Order"])
 orderPalette = getPalette(length(orderList))
@@ -278,17 +290,14 @@ platyK.tree.dna.skeleton <- treemap_gg_dv2(platyK.dna2.skeleton, Cluster, Order,
 platyH.tree.dna.skeleton <- treemap_gg_dv2(platyH.dna2.skeleton, Cluster, Order, "Platygyra Hantu - Skeleton DNA samples", orderPalette)
 goni.tree.dna.skeleton <- treemap_gg_dv2(goni.dna2.skeleton, Cluster, Order, "Goniopora Hantu - Skeleton DNA samples", orderPalette)
 
-
-
+#Arrange plots in grid
 treemap.grid <- grid.arrange(goni.tree.dna.tissue, platyH.tree.dna.tissue, platyK.tree.dna.tissue, pocil.tree.dna.skeleton,
                              goni.tree.dna.skeleton, platyH.tree.dna.skeleton, platyK.tree.dna.skeleton, pocil.tree.dna.skeleton, nrow = 2)
 
-
-
-# ggsave("nifH_I-III_DNA_species_tissue_skeleton_order_cluster.pdf", plot = treemap.grid, 
+# ggsave("nifH_I-III_DNA_species_tissue_skeleton_order_cluster_updated.pdf", plot = treemap.grid,
 #        path = "/path",
-#        width = 18,
-#        height = 10)
+#        width = 30,
+#        height = 18)
 
 
 #------------------------------------------------------------------------------------------------
@@ -422,32 +431,31 @@ sup.bar2 <- plot_bar(ps.top, fill="Class", x="Sample") + facet_wrap(NucleicType~
 #Select samples for which both RNA and DNA data are available
 ratio.nfix.coral <- ps.nfix.coral.norm%>% subset_samples(Name =="14S"| Name =="15S"| Name =="15T"| Name == "2S"| Name == "6T"| Name == "7T"| Name == "8T")
 
+# Make custom color palette for the order level
+getPalette = colorRampPalette(c(brewer.pal(12, "Paired"), brewer.pal(8, "Set1"), brewer.pal(8, "Pastel2"), brewer.pal(8, "Accent"))) 
+orderList = unique(tax_table(ratio.nfix.coral)[,"Order"])
+orderPalette = getPalette(length(orderList))
+names(orderPalette) = orderList
 
-#Agglomerate taxa by order
-nfix.glom <- tax_glom(ratio.nfix.coral, taxrank="Order", NArm=TRUE)  
+#Merge replicate samples
+merged.nfix <- merge_samples(ratio.nfix.coral, "NucleicType")
 
 #Normalize
-nfix.glom.norm = ps_normalize_median(nfix.glom, "merged_coral_norm")
+nfix.norm = ps_normalize_median(merged.nfix, "merged_coral_norm")
 
-#Merge samples based on nucleic acid type (i.e. DNA or RNA)
-merged.nfix <- merge_samples(nfix.glom.norm, "NucleicType")
+#Convert phyloseq to dataframe
+nfix.ASV.df <-phyloseq_to_df(nfix.norm, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
 
-#Select abundant taxa and normalize again
-merged.nfix.abund = ps_abundant(merged.nfix, contrib_min=0.001, "merged_coral_abund")
+#Select only ASVs present in both RNA and DNA samples
+nfix.ASV.df.select <-nfix.ASV.df %>% filter(RNA > 0 & DNA >0)
 
-#Convert phyloseq into dataframe
-nfix.glom.df <-phyloseq_to_df(merged.nfix.abund, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
-
-ratios.nfix <- ggplot(nfix.glom.df, aes(x= DNA, y= RNA, colour=Class, label=Order))+
+s17 <- ggplot(nfix.ASV.df.select, aes(x= DNA, y= RNA, colour=Class, label=Order))+
   geom_point(size = 3) + geom_text(aes(label=Order),hjust=0, vjust=0) +  geom_abline(intercept = 0) +
   theme_bw() +  ggtitle("RNA:DNA nifH")+
   scale_x_continuous(trans = 'log10') +
   scale_y_continuous(trans = 'log10')+
-  annotation_logticks(sides="lb")+  expand_limits(x = 100 ,y = 100)  +  scale_color_manual(values=classPalette)
+  annotation_logticks(sides="lb")+  expand_limits(x = 1000 ,y = 1000)  +  scale_color_manual(values=orderPalette)
 
-
-# ggsave("nifH_RNA_DNA.pdf", plot = ratios.nfix, path = "/path",
+# ggsave("nifH_RNA_DNA_byOTU.pdf", plot = s17, path = "/path",
 #        width = 8,
 #        height = 6)
-# 
-# 
