@@ -78,7 +78,7 @@ ps.SW.norm = ps_normalize_median(ps.SW.all, "Coral_16S_all_LR_norm")
 
 
 ##---------------------------------------------------------------------
-# Figure S8. 16S coral plastid sequences
+# Figure S7. 16S coral plastid sequences
 ##---------------------------------------------------------------------
 
 getPalette = colorRampPalette(c( brewer.pal(8,"Spectral"), brewer.pal(8,"Dark2"),  brewer.pal(9, "Set1"),brewer.pal(12, "Set3")))
@@ -120,14 +120,14 @@ genus <- plot_bar(ps.top_c, fill="Genus", x="Bars2") + facet_wrap(~Type, 2, scal
 
 x <-grid.arrange(order, genus, nrow = 1)
 
-# ggsave("plastid_barplots.pdf", plot = x, path = "/Users/molly/Dropbox/NitrogenFixation_Singapore/Manuscripts/August_experiment_manuscript/overleaf_supplemental",
+# ggsave("plastid_barplots.pdf", plot = x, path = "\path",
 #        width = 20,
 #        height = 15)
 
 
 
 ##---------------------------------------------------------------------
-# Figure S13a. 16S seawater plastid sequences
+# Figure S12a. 16S seawater plastid sequences
 ##---------------------------------------------------------------------
 
 # Function fortTreemap with custom color palette 
@@ -147,7 +147,7 @@ treemap_gg_dv2 <- function(df, group1, group2, title, c.palette) {
     treemapify::geom_treemap_subgroup_text(place = "centre", grow = T, alpha = 0.5, colour =
                                              "white", fontface = "italic", min.size = 0) +
     scale_fill_manual(values=c.palette) +
-    theme(legend.position="none", plot.title = element_text(size = 16, face = "bold"))
+    theme(legend.position="none", plot.title = element_text(size = 16, face = "bold")) #Switch legend position to "bottom" for legend
   print(g_treemap)
   return(g_treemap)
 }
@@ -176,6 +176,6 @@ long_SW <- ps_to_long_SW(ps.SW.norm)
 dna.tree.order <- treemap_gg_dv2(long_SW, Class, Family,"Seawater Plastid 16S DNA-based community", familyPalette)
 
 # ggsave("SW_16S_Plastid_community.pdf", plot = dna.tree.order,
-#        path = "/Users/molly/Dropbox/NitrogenFixation_Singapore/Manuscripts/August_experiment_manuscript/overleaf_supplemental",
+#        path = "/path",
 #        width = 5,
 #        height = 5)

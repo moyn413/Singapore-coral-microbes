@@ -166,7 +166,7 @@ adonis(BC.dist ~ sample_data(ps.stats)$Species,permutations = 1000)
 
 
 ##---------------------------------------------------------------------
-# Figure S9. Symbiodinium relative abundance
+# Figure S8. Symbiodinium relative abundance
 ##---------------------------------------------------------------------
 
 getPalette = colorRampPalette(c(brewer.pal(8, "Dark2"), brewer.pal(12, "Paired"), brewer.pal(8, "Set1"))) 
@@ -197,7 +197,7 @@ genus <- plot_bar(ps.top_c, fill="Species", x="Name") + facet_wrap(~Type, 2, sca
 
 
 ##---------------------------------------------------------------------
-# Figure S10. 18S Principal coordinates analysis
+# Figure S9. 18S Principal coordinates analysis
 ##---------------------------------------------------------------------
 
 logt  = transform_sample_counts(ps.coral.all.norm, function(x) log(1 + x) )
@@ -216,7 +216,7 @@ pcoa.plot1
 
 
 ##---------------------------------------------------------------------
-# Figure S11. 18S tree maps with no Symbiodinium
+# Figure S10. 18S tree maps with no Symbiodinium
 ##---------------------------------------------------------------------
 
 
@@ -253,7 +253,7 @@ treemap_gg_dv2 <- function(df, group1, group2, title, c.palette) {
     treemapify::geom_treemap_subgroup_text(place = "centre", grow = T, alpha = 0.5, colour =
                                              "white", fontface = "italic", min.size = 0) +
     scale_fill_manual(values=c.palette) +
-    theme(legend.position="none", plot.title = element_text(size = 16, face = "bold"))
+    theme(legend.position="bottom", plot.title = element_text(size = 16, face = "bold")) #Change legend position to "bottom" for legend
   print(g_treemap)
   return(g_treemap)
 }
@@ -302,8 +302,9 @@ x.order <-grid.arrange(dna.tissue.tree.order, dna.skeleton.tree.order, rna.tissu
 
 
 
+
 ##---------------------------------------------------------------------
-# Figure S13b. Seawater 18S treemaps
+# Figure S12b. Seawater 18S treemaps
 ##---------------------------------------------------------------------
 
 
@@ -335,4 +336,5 @@ dna.tree.order <- treemap_gg_dv2(long_SW, Class, Family,"Seawater 18S DNA-based 
 #        path = "/path",
 #        width = 5,
 #        height = 5)
+
 

@@ -233,7 +233,7 @@ treemap_gg_dv2 <- function(df, group1, group2, title, c.palette) {
     treemapify::geom_treemap_subgroup_text(place = "centre", grow = T, alpha = 0.5, colour =
                                              "white", fontface = "italic", min.size = 0) +
     scale_fill_manual(values=c.palette) +
-    theme(legend.position="none", plot.title = element_text(size = 16, face = "bold"))
+    theme(legend.position="none", plot.title = element_text(size = 16, face = "bold")) #Can switch legend position to "bottom" to see legend
   print(g_treemap)
   return(g_treemap)
 }
@@ -373,7 +373,7 @@ nfix.deseq <- ps_do_deseq(deseq.subset, 0.8) + ggtitle("all samples clusters I -
 ##---------------------------------------------------------------------
 
 ##---------------------------------------------------------------------
-# Figure S14. nifH Cluster abundance (all clusters)
+# Figure S13. nifH Cluster abundance (all clusters)
 ##---------------------------------------------------------------------
 
 
@@ -397,7 +397,7 @@ sup.bar <- plot_bar(ps.top, fill="Cluster", x="Bars3") + facet_wrap(~Cluster, sc
 
 
 ##---------------------------------------------------------------------
-# Figure S15.  nifH RNA-based Clusters I--III
+# Figure S14.  nifH RNA-based Clusters I--III
 ##---------------------------------------------------------------------
 getPalette = colorRampPalette(c(brewer.pal(8,"Dark2"),brewer.pal(9, "Set1"),brewer.pal(12, "Set3"),brewer.pal(8,"Spectral")))
 classList = unique(tax_table(ps.nfix.coral.norm)[,"Class"])
@@ -425,7 +425,7 @@ sup.bar2 <- plot_bar(ps.top, fill="Class", x="Sample") + facet_wrap(NucleicType~
 
 
 ##---------------------------------------------------------------------
-# Figure S17. nifH RNA:DNA ratios of Clusters I - III only
+# Figure S16. nifH RNA:DNA ratios of Clusters I - III only
 ##---------------------------------------------------------------------
 
 #Select samples for which both RNA and DNA data are available

@@ -432,8 +432,169 @@ pcoa.weighted  <- grid.arrange(platyH.pcoa1, goni.pcoa1, pocil.pcoa1, platyK.pco
 #        height = 5)
 
 
+
+
+
 ##---------------------------------------------------------------------
-# Figure 7a. RNA:DNA ratio plot
+##----------SUPPLEMENTAL FIGURES-------------------------------
+##---------------------------------------------------------------------
+
+
+
+
+##---------------------------------------------------------------------
+# Figure S5. Treemaps 
+##---------------------------------------------------------------------
+
+
+# Deine function to convert phyloseq for treemaps
+ps_to_long <- function(ps) {
+  otu_df <- data.frame(otu_table(ps)) %>% 
+    rownames_to_column(var = "otu_id")
+  taxo_df <- data.frame(tax_table(ps))%>% 
+    rownames_to_column(var = "otu_id")
+  otu_df <- left_join(taxo_df, otu_df)
+  otu_df <- gather(otu_df, "sample","n_seq" ,contains("X")) # All samples contain X
+  metadata_df <- data.frame(sample_data(ps)) %>% 
+    rownames_to_column(var = "sample")
+  otu_df <- left_join(otu_df, metadata_df)
+}
+
+
+
+
+# Function fortTreemap with custom color palette 
+treemap_gg_dv2 <- function(df, group1, group2, title, c.palette) {
+  group1 <- enquo(group1)
+  group2 <- enquo(group2)
+  
+  df <- df %>% group_by(!!group1, !!group2) %>%  summarise(n_seq=sum(n_seq))
+  g_treemap <- ggplot(df, aes(area = n_seq, fill = !!group2, 
+                              label = !!group2, subgroup = !!group1)) +
+    ggtitle(title) +
+    treemapify::geom_treemap() +
+    treemapify::geom_treemap_subgroup_border() +
+    treemapify::geom_treemap_text(colour = "black", place = "topleft", reflow = T, 
+                                  padding.x =  grid::unit(3, "mm"), 
+                                  padding.y = grid::unit(3, "mm")) +
+    treemapify::geom_treemap_subgroup_text(place = "centre", grow = T, alpha = 0.5, colour =
+                                             "white", fontface = "italic", min.size = 0) +
+    scale_fill_manual(values=c.palette) +
+    theme(legend.position="none", plot.title = element_text(size = 16, face = "bold")) #Can switch legend position to "bottom"to see legend
+  print(g_treemap)
+  return(g_treemap)
+}
+
+
+
+# Make custom color palette for the order level 
+getPalette = colorRampPalette(c(brewer.pal(8, "Set1"), brewer.pal(8, "Dark2"),brewer.pal(8, "Accent"))) 
+orderList = unique(tax_table(ps.coral.all.abund)[,"Order"])
+orderPalette = getPalette(length(orderList))
+names(orderPalette) = orderList
+
+#Make subset of data for different teemaps
+tree.dna <- subset_samples(ps.coral.all.abund, NucleicType=="DNA")
+tree.rna <- subset_samples(ps.coral.all.abund, NucleicType=="RNA")
+tissue.dna <- subset_samples(tree.dna, Type2=="Tissue")
+skeleton.dna <- subset_samples(tree.dna, Type2=="Skeleton")
+tissue.rna <- subset_samples(tree.rna, Type2=="Tissue")
+skeleton.rna <- subset_samples(tree.rna, Type2=="Skeleton")
+
+
+#convert to ps_to_long 
+long_tissue_rna <- ps_to_long(tissue.rna)
+long_skeleton_rna <- ps_to_long(skeleton.rna)
+long_tissue_dna <- ps_to_long(tissue.dna)
+long_skeleton_dna <- ps_to_long(skeleton.dna)
+
+#DNA tissue treemap
+dna.tissue.tree.order <- treemap_gg_dv2(long_tissue_dna, Class, Order,"Coral 16S rRNA community - Tissue DNA samples", orderPalette)
+#DNA skeleton treemap
+dna.skeleton.tree.order <- treemap_gg_dv2(long_skeleton_dna, Class, Order,"Coral 16S rRNA community - Skeleton DNA samples",orderPalette)
+#RNA tissue treemap
+rna.tissue.tree.order <- treemap_gg_dv2(long_tissue_rna, Class, Order,"Coral 16S rRNA community - Tissue RNA samples", orderPalette)
+#RNA skeleton treemap
+rna.skeleton.tree.order <- treemap_gg_dv2(long_skeleton_rna, Class, Order,"Coral 16S rRNA community - Skeleton RNA samples",orderPalette)
+
+x.order <-grid.arrange(dna.tissue.tree.order, dna.skeleton.tree.order, rna.tissue.tree.order, rna.skeleton.tree.order, nrow = 2)
+
+# ggsave("ST_DNA_RNA_treeplots_order_updated_final.pdf", plot = x.order,
+#        path = "/path",width = 10, height = 8)
+
+
+##---------------------------------------------------------------------
+# Figure S6. Bar plots 
+##---------------------------------------------------------------------
+
+# Make custom color palette for the order level 
+getPalette = colorRampPalette(c(brewer.pal(8, "Set1"), brewer.pal(8, "Dark2"),brewer.pal(8, "Accent"))) 
+orderList = unique(tax_table(ps.coral.all.abund)[,"Order"])
+orderPalette = getPalette(length(orderList))
+names(orderPalette) = orderList
+
+
+#Fig S6a
+top <- names(sort(taxa_sums(ps.coral.dna.abund), decreasing=TRUE))[1:300]
+ps.top <- transform_sample_counts(ps.coral.dna.abund, function(OTU) OTU/sum(OTU))
+ps.top <- prune_taxa(top, ps.top)
+dna.bar <- plot_bar(ps.top, fill="Order", x="Sample") + facet_wrap(~SpeciesType, 2, scales="free_x")+
+  theme(legend.key.size = unit(0.9,"line"))  + theme(legend.position="bottom") + scale_fill_manual(values=orderPalette)
+
+
+# ggsave("16S_dna_all.pdf", plot = dna.bar,
+#        path = "/path",
+#        width = 15, height = 8)
+
+
+#Fig S6b
+top <- names(sort(taxa_sums(ps.coral.rna.abund), decreasing=TRUE))[1:300]
+ps.top <- transform_sample_counts(ps.coral.rna.abund, function(OTU) OTU/sum(OTU))
+ps.top <- prune_taxa(top, ps.top)
+rna.bar <- plot_bar(ps.top, fill="Order", x="Sample") + facet_wrap(~SpeciesType, 2, scales="free_x")+
+  theme(legend.key.size = unit(0.9,"line"))  + theme(legend.position="bottom") + scale_fill_manual(values=orderPalette)
+
+# 
+# ggsave("16S_rna_all.pdf", plot = rna.bar,
+#        path = "/path",
+#        width = 15, height = 10)
+
+##---------------------------------------------------------------------
+# Figure S11. Seawater community 16S tree map
+##---------------------------------------------------------------------
+
+# Define color palettes for Seawater
+getPalette = colorRampPalette(c(brewer.pal(8, "Dark2"), brewer.pal(12, "Paired"))) 
+orderList = unique(tax_table(ps.SW.norm)[,"Order"])
+orderPalette = getPalette(length(orderList))
+names(orderPalette) = orderList
+
+
+ps_to_long_SW <- function(ps) {
+  otu_df <- data.frame(otu_table(ps)) %>% 
+    rownames_to_column(var = "otu_id")
+  taxo_df <- data.frame(tax_table(ps))%>% 
+    rownames_to_column(var = "otu_id")
+  otu_df <- left_join(taxo_df, otu_df)
+  otu_df <- gather(otu_df, "sample","n_seq" ,contains("SW")) # All samples contain X
+  metadata_df <- data.frame(sample_data(ps)) %>% 
+    rownames_to_column(var = "sample")
+  otu_df <- left_join(otu_df, metadata_df)
+}
+
+# Seawater tree maps
+long_SW <- ps_to_long_SW(ps.SW.norm)
+dna.tree.order <- treemap_gg_dv2(long_SW, Class, Order,"Seawater 16S DNA-based community", orderPalette)
+
+# ggsave("SW_16S_community.pdf", plot = dna.tree.order,
+#        path = "/path",
+#        width = 5,
+#        height = 5)
+
+
+
+##---------------------------------------------------------------------
+# Figure S15 RNA:DNA ratio plot
 ##---------------------------------------------------------------------
 
 #Subset each coral/site (with both RNA and DNA)
@@ -519,14 +680,14 @@ all.coral.ratios <- as_tibble(rbind(goni.df2, platyH.df2,platyK.df2,pocil.df2))
 
 #Select subset of taxa
 select.ratios <- filter(all.coral.ratios, Order == "Propionibacteriales"| Order == "Bacteroidales"| Order == "Campylobacterales" | 
-                                   Order == "Anaerolineales"| Order =="Ardenticatenales"| Order =="Caldilineales"| Order =="SBR1031" | 
-                                   Order =="Chloroflexales" | Order =="SAR202 clade" |  Order == "Chroococcales" | Order =="Nostocales"| 
-                                   Order == "Oscillatoriales" | Order =="Pleurocapsales"  | Order == "Synechococcales" | 
-                                   Order== "Desulfarculales"| Order== "Desulfobacterales"  | Order == "Desulfobulbales" | Order =="Desulfovibrionales" | 
-                                   Order== "Clostridiales"| Order =="Kiloniellales" | Order == "Rhizobiales" | Order == "Rhodobacterales" | 
-                                   Order =="Rhodospirillales" | Order == "Burkholderiales" | Order =="Alteromonadales" | Order =="Chromatiales" | 
-                                   Order =="Oceanospirillales" | Order == "Pseudomonadales"| Order =="Thiotrichales" | Order == "Vibrionales" | 
-                                   Order == "Verrucomicrobiales")
+                          Order == "Anaerolineales"| Order =="Ardenticatenales"| Order =="Caldilineales"| Order =="SBR1031" | 
+                          Order =="Chloroflexales" | Order =="SAR202 clade" |  Order == "Chroococcales" | Order =="Nostocales"| 
+                          Order == "Oscillatoriales" | Order =="Pleurocapsales"  | Order == "Synechococcales" | 
+                          Order== "Desulfarculales"| Order== "Desulfobacterales"  | Order == "Desulfobulbales" | Order =="Desulfovibrionales" | 
+                          Order== "Clostridiales"| Order =="Kiloniellales" | Order == "Rhizobiales" | Order == "Rhodobacterales" | 
+                          Order =="Rhodospirillales" | Order == "Burkholderiales" | Order =="Alteromonadales" | Order =="Chromatiales" | 
+                          Order =="Oceanospirillales" | Order == "Pseudomonadales"| Order =="Thiotrichales" | Order == "Vibrionales" | 
+                          Order == "Verrucomicrobiales")
 
 #Create column with merged taxonomic information "phyum, class, order" to facilitate plot organization on the y-axis
 select.ratios.new <- unite(select.ratios, "Phylum_Class_Order", Phylum:Class:Order, sep = "_",  remove = FALSE )
@@ -552,221 +713,6 @@ finalplot_log_revised <- ggplot(avg.ratios, aes(x= RNADNA, y= factor(Phylum_Clas
 # ggsave("select_RNA_DNA_ratios_byspecies_log_v2.pdf", plot = finalplot_log, path = "/path",
 #        width = 10,
 #        height = 9)
-
-
-##---------------------------------------------------------------------
-# Figure 7b. RNA:DNA Scatter plots with selected OTUs in the tissue and skeleton
-##---------------------------------------------------------------------
-
-#Make custom color palette for the class level
-getPalette = colorRampPalette(c(brewer.pal(8, "Set1"),brewer.pal(8, "Set2"),brewer.pal(12, "Set3"))) 
-classList = unique(select.ratios.new$Class)
-classPalette = getPalette(length(classList))
-names(classPalette) = classList
-
-tissue.scatter <- select.ratios.new %>% filter(Type== "Tissue")
-skeleton.scatter <- select.ratios.new %>% filter(Type== "Skeleton")
-
-p1 <- ggplot(tissue.scatter, aes(x= DNA, y= RNA, colour=Class, label=Class, group = Class))+
-  geom_point(size = 3) + 
-  #  geom_text(aes(label=Class),hjust=0, vjust=0) + 
-  geom_abline(intercept = 0) +
-  theme_bw() +  ggtitle("RNA:DNA in tissue")+
-  scale_x_continuous(trans = 'log10') + 
-  scale_y_continuous(trans = 'log10')+
-  annotation_logticks(sides="lb")+  expand_limits(x = 100 ,y = 1000)  + scale_color_manual(values=classPalette)
-
-p2 <- ggplot(skeleton.scatter, aes(x= DNA, y= RNA, colour=Class, label=Class, group=Class))+
-  geom_point(size = 3) + 
-  #geom_text(aes(label=Order),hjust=0, vjust=0) + 
-  geom_abline(intercept = 0) +
-  theme_bw() +  ggtitle("RNA:DNA in skeleton")+
-  scale_x_continuous(trans = 'log10') + 
-  scale_y_continuous(trans = 'log10')+
-  annotation_logticks(sides="lb")+  expand_limits(x = 100 ,y = 1000)  +  scale_color_manual(values=classPalette) 
-
-x <-grid.arrange(p1,p2, nrow = 2)
-
-#Save plot
-# ggsave("T_S_DNA_RNA_scatter_byOTU_v2.pdf", plot = finalplot_log, path = "/path",
-#        width = 7,
-#        height = 8)
-
-
-#--------Remove alpha and gammaproteobacteria from the plots above and replot--------#
-
-skeleton.scatter_noAG <- select.ratios.new %>% filter(Type== "Skeleton") %>% filter(Class != "Alphaproteobacteria" & Class != "Gammaproteobacteria")
-tissue.scatter_noAG <- select.ratios.new %>% filter(Type== "Tissue") %>% filter(Class != "Alphaproteobacteria" & Class != "Gammaproteobacteria")
-
-p3 <- ggplot(tissue.scatter_noAG, aes(x= DNA, y= RNA, colour=Class, label=Class, group = Class))+
-  geom_point(size = 3) + 
-  #geom_text(aes(label=Order),hjust=0, vjust=0) + 
-  geom_abline(intercept = 0) + 
-  theme_bw() +  ggtitle("RNA:DNA in tissue")+
-  scale_x_continuous(trans = 'log10') + 
-  scale_y_continuous(trans = 'log10')+
-  annotation_logticks(sides="lb")+  expand_limits(x = 100 ,y = 100)  + scale_color_manual(values=classPalette)
-
-p4 <- ggplot(skeleton.scatter_noAG, aes(x= DNA, y= RNA, colour=Class, label=Class, group = Class))+
-  geom_point(size = 3) +
-  #geom_text(aes(label=Order),hjust=0, vjust=0) + 
-  geom_abline(intercept = 0) +
-  theme_bw() +  ggtitle("RNA:DNA in skeleton")+
-  scale_x_continuous(trans = 'log10') + 
-  scale_y_continuous(trans = 'log10')+
-  annotation_logticks(sides="lb")+  expand_limits(x = 1000 ,y = 1000)  +  scale_color_manual(values=classPalette) 
-
-x <-grid.arrange(p3,p4, nrow = 2)
-
-#Save plot
-# ggsave("T_S_DNA_RNA_scatter_byOTU_noalphagamma_v2.pdf", plot = finalplot_log, path = "/path",
-#        width = 7,
-#        height = 8)
-
-
-
-
-
-
-
-##---------------------------------------------------------------------
-##----------SUPPLEMENTAL FIGURES-------------------------------
-##---------------------------------------------------------------------
-
-
-
-
-##---------------------------------------------------------------------
-# Figre S6. Treemaps 
-##---------------------------------------------------------------------
-
-
-# Deine function to convert phyloseq for treemaps
-ps_to_long <- function(ps) {
-  otu_df <- data.frame(otu_table(ps)) %>% 
-    rownames_to_column(var = "otu_id")
-  taxo_df <- data.frame(tax_table(ps))%>% 
-    rownames_to_column(var = "otu_id")
-  otu_df <- left_join(taxo_df, otu_df)
-  otu_df <- gather(otu_df, "sample","n_seq" ,contains("X")) # All samples contain X
-  metadata_df <- data.frame(sample_data(ps)) %>% 
-    rownames_to_column(var = "sample")
-  otu_df <- left_join(otu_df, metadata_df)
-}
-
-
-
-
-# Function fortTreemap with custom color palette 
-treemap_gg_dv2 <- function(df, group1, group2, title, c.palette) {
-  group1 <- enquo(group1)
-  group2 <- enquo(group2)
-  
-  df <- df %>% group_by(!!group1, !!group2) %>%  summarise(n_seq=sum(n_seq))
-  g_treemap <- ggplot(df, aes(area = n_seq, fill = !!group2, 
-                              label = !!group2, subgroup = !!group1)) +
-    ggtitle(title) +
-    treemapify::geom_treemap() +
-    treemapify::geom_treemap_subgroup_border() +
-    treemapify::geom_treemap_text(colour = "black", place = "topleft", reflow = T, 
-                                  padding.x =  grid::unit(3, "mm"), 
-                                  padding.y = grid::unit(3, "mm") ) +
-    treemapify::geom_treemap_subgroup_text(place = "centre", grow = T, alpha = 0.5, colour =
-                                             "white", fontface = "italic", min.size = 0) +
-    scale_fill_manual(values=c.palette) +
-    theme(legend.position="none", plot.title = element_text(size = 16, face = "bold"))
-  print(g_treemap)
-  return(g_treemap)
-}
-
-
-# Make custom color palette for the order level 
-getPalette = colorRampPalette(c(brewer.pal(8, "Set1"), brewer.pal(8, "Dark2"),brewer.pal(8, "Accent"))) 
-orderList = unique(tax_table(ps.coral.all.abund)[,"Order"])
-orderPalette = getPalette(length(orderList))
-names(orderPalette) = orderList
-
-#Make subset of data for different teemaps
-tree.dna <- subset_samples(ps.coral.all.abund, NucleicType=="DNA")
-tree.rna <- subset_samples(ps.coral.all.abund, NucleicType=="RNA")
-tissue.dna <- subset_samples(tree.dna, Type2=="Tissue")
-skeleton.dna <- subset_samples(tree.dna, Type2=="Skeleton")
-tissue.rna <- subset_samples(tree.rna, Type2=="Tissue")
-skeleton.rna <- subset_samples(tree.rna, Type2=="Skeleton")
-
-
-#convert to ps_to_long 
-long_tissue_rna <- ps_to_long(tissue.rna)
-long_skeleton_rna <- ps_to_long(skeleton.rna)
-long_tissue_dna <- ps_to_long(tissue.dna)
-long_skeleton_dna <- ps_to_long(skeleton.dna)
-
-#DNA tissue treemap
-dna.tissue.tree.order <- treemap_gg_dv2(long_tissue_dna, Class, Order,"Coral 16S rRNA community - Tissue DNA samples", orderPalette)
-#DNA skeleton treemap
-dna.skeleton.tree.order <- treemap_gg_dv2(long_skeleton_dna, Class, Order,"Coral 16S rRNA community - Skeleton DNA samples",orderPalette)
-#RNA tissue treemap
-rna.tissue.tree.order <- treemap_gg_dv2(long_tissue_rna, Class, Order,"Coral 16S rRNA community - Tissue RNA samples", orderPalette)
-#RNA skeleton treemap
-rna.skeleton.tree.order <- treemap_gg_dv2(long_skeleton_rna, Class, Order,"Coral 16S rRNA community - Skeleton RNA samples",orderPalette)
-
-x.order <-grid.arrange(dna.tissue.tree.order, dna.skeleton.tree.order, rna.tissue.tree.order, rna.skeleton.tree.order, nrow = 2)
-
-# ggsave("ST_DNA_RNA_treeplots_order_updated.pdf", plot = x.order,
-#        path = "/path",width = 10, height = 8)
-
-
-
-##---------------------------------------------------------------------
-# Figure S7. Bar plots 
-##---------------------------------------------------------------------
-
-#Fig S7a
-top <- names(sort(taxa_sums(ps.coral.dna.abund), decreasing=TRUE))[1:300]
-ps.top <- transform_sample_counts(ps.coral.dna.abund, function(OTU) OTU/sum(OTU))
-ps.top <- prune_taxa(top, ps.top)
-dna.bar <- plot_bar(ps.top, fill="Order", x="Sample") + facet_wrap(~SpeciesType, 2, scales="free_x")+
-  theme(legend.key.size = unit(0.9,"line"))  + theme(legend.position="bottom")
-
-#Fig S7b
-top <- names(sort(taxa_sums(ps.coral.rna.abund), decreasing=TRUE))[1:300]
-ps.top <- transform_sample_counts(ps.coral.rna.abund, function(OTU) OTU/sum(OTU))
-ps.top <- prune_taxa(top, ps.top)
-rna.bar <- plot_bar(ps.top, fill="Order", x="Sample") + facet_wrap(~SpeciesType, 2, scales="free_x")+
-  theme(legend.key.size = unit(0.9,"line"))  + theme(legend.position="bottom")
-
-
-##---------------------------------------------------------------------
-# Figure S12. Seawater community 16S tree map
-##---------------------------------------------------------------------
-
-# Define color palettes for Seawater
-getPalette = colorRampPalette(c(brewer.pal(8, "Dark2"), brewer.pal(12, "Paired"))) 
-orderList = unique(tax_table(ps.SW.norm)[,"Order"])
-orderPalette = getPalette(length(orderList))
-names(orderPalette) = orderList
-
-
-ps_to_long_SW <- function(ps) {
-  otu_df <- data.frame(otu_table(ps)) %>% 
-    rownames_to_column(var = "otu_id")
-  taxo_df <- data.frame(tax_table(ps))%>% 
-    rownames_to_column(var = "otu_id")
-  otu_df <- left_join(taxo_df, otu_df)
-  otu_df <- gather(otu_df, "sample","n_seq" ,contains("SW")) # All samples contain X
-  metadata_df <- data.frame(sample_data(ps)) %>% 
-    rownames_to_column(var = "sample")
-  otu_df <- left_join(otu_df, metadata_df)
-}
-
-# Seawater tree maps
-long_SW <- ps_to_long_SW(ps.SW.norm)
-dna.tree.order <- treemap_gg_dv2(long_SW, Class, Order,"Seawater 16S DNA-based community", orderPalette)
-
-# ggsave("SW_16S_community.pdf", plot = dna.tree.order,
-#        path = "/path",
-#        width = 5,
-#        height = 5)
 
 
 
