@@ -78,7 +78,7 @@ ps.SW.norm = ps_normalize_median(ps.SW.all, "Coral_16S_all_LR_norm")
 
 
 ##---------------------------------------------------------------------
-# Figure S7. 16S coral plastid sequences
+# Figure S7. 16S rRNA coral plastid sequences
 ##---------------------------------------------------------------------
 
 getPalette = colorRampPalette(c( brewer.pal(8,"Spectral"), brewer.pal(8,"Dark2"),  brewer.pal(9, "Set1"),brewer.pal(12, "Set3")))
@@ -127,7 +127,7 @@ x <-grid.arrange(order, genus, nrow = 1)
 
 
 ##---------------------------------------------------------------------
-# Figure S12a. 16S seawater plastid sequences
+# Figure S12a. 16S rRNA seawater plastid sequences
 ##---------------------------------------------------------------------
 
 # Function fortTreemap with custom color palette 
@@ -173,7 +173,7 @@ ps_to_long_SW <- function(ps) {
 
 # Seawater tree map
 long_SW <- ps_to_long_SW(ps.SW.norm)
-dna.tree.order <- treemap_gg_dv2(long_SW, Class, Family,"Seawater Plastid 16S DNA-based community", familyPalette)
+dna.tree.order <- treemap_gg_dv2(long_SW, Class, Family,"Seawater Plastid 16S rRNA, DNA-based community", familyPalette)
 
 # ggsave("SW_16S_Plastid_community.pdf", plot = dna.tree.order,
 #        path = "/path",

@@ -25,7 +25,7 @@ library(metagMisc)
 # Load phyloseq file
 #--------------------------------
 
-ps <- readRDS("/Users/molly/Documents/GitHub/Singapore-coral-microbes/nifH/SGcoral_nifH_phyloseq_cluster.rds")   #read RDS phyloseq file
+ps <- readRDS("/GitHub/Singapore-coral-microbes/nifH/SGcoral_nifH_phyloseq_cluster.rds")   #read RDS phyloseq file
 # dataset_path <- "~/GitHub/Singapore-coral-microbes/nifH"
 # path_dataset <- function(file_name) str_c(dataset_path, file_name)
 # treefasta_dir <-    path_dataset("/processed_nifH_ASVs/")
@@ -83,10 +83,10 @@ ps.SW.LO <- prune_taxa(taxa_sums(ps.SW.LR)>=10, ps.SW.LR)
 # Biostrings::writeXStringSet(seqs, str_c(treefasta_dir, "CORALnifH_ASV_SW_LO.fasta"), compress = FALSE, width = 20000)
 
 #Add Newick file made in Geneious Prime to phyloseq
-all.dna.tree <- ape::read.tree("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/nifH/nifH_August_coral_SW_plus/dada2_phylum/trees/ALL_nifH_ASV_LO alignment FastTree Tree.newick")
-coral.dna.tree <- ape::read.tree("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/nifH/nifH_August_coral_SW_plus/dada2_phylum/trees/CORALnifH_ASV_DNA_LO alignment FastTree Tree.newick")
-coral.rna.tree <- ape::read.tree("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/nifH/nifH_August_coral_SW_plus/dada2_phylum/trees/CORALnifH_ASV_RNA_LO alignment FastTree Tree.newick")
-SW.tree <- ape::read.tree("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/nifH/nifH_August_coral_SW_plus/dada2_phylum/trees/CORALnifH_ASV_SW_LO alignment FastTree Tree.newick")
+all.dna.tree <- ape::read.tree("/GitHub/Singapore-coral-microbes/nifH/phyloseq tree files/ALL_nifH_ASV_LO alignment FastTree Tree.newick")
+coral.dna.tree <- ape::read.tree("/GitHub/Singapore-coral-microbes/nifH/phyloseq tree files/CORALnifH_ASV_DNA_LO alignment FastTree Tree.newick")
+coral.rna.tree <- ape::read.tree("/GitHub/Singapore-coral-microbes/nifH/phyloseq tree files/CORALnifH_ASV_RNA_LO alignment FastTree Tree.newick")
+SW.tree <- ape::read.tree("/GitHub/Singapore-coral-microbes/nifH/phyloseq tree files/CORALnifH_ASV_SW_LO alignment FastTree Tree.newick")
 
 #------------------------------------------------------------------------------------------------
 ps.all.LO <- merge_phyloseq(ps.all.LO, all.dna.tree) 
@@ -188,6 +188,127 @@ ps.nfix.coral.rna.norm = ps_normalize_median(ps.nfix.coral.rna, "Coral_nifH_clus
 ps.nfix.SW.norm = ps_normalize_median(ps.nfix.SW, "SW_nifH_clusters_norm")
 
 
+#-------------------------------
+# Cluster summary
+#-------------------------------
+clusterI <- ps.all %>% subset_taxa(Cluster=="Cluster I")%>% sample_sums(.) 
+clusterII <- ps.all %>% subset_taxa(Cluster=="Cluster II")%>% sample_sums(.) 
+clusterIII<-ps.all %>% subset_taxa(Cluster=="Cluster III")%>% sample_sums(.) 
+clusterIV<-ps.all %>% subset_taxa(Cluster=="Cluster IV")%>% sample_sums(.) 
+clusterV.L<-ps.all %>% subset_taxa(Cluster=="Cluster V chL/bchL")%>% sample_sums(.) 
+clusterV.X<-ps.all %>% subset_taxa(Cluster=="Cluster V chlX/bchX" )%>% sample_sums(.) 
+clusterVI<-ps.all %>% subset_taxa(Cluster=="Cluster VI")%>% sample_sums(.) 
+unknown <-ps.all %>% subset_taxa(Cluster=="unknown")%>% sample_sums(.) 
+
+cluster.summary <-cbind(clusterI,clusterII,clusterIII,clusterIV,clusterV.L,clusterV.X,clusterVI,unknown)
+
+# write.csv(cluster.summary, "cluster.summary2.csv",  row.names = TRUE )
+
+
+
+#-------------------------------
+#  PERMANOVAS 
+#-------------------------------
+
+#-------------------------------
+# Between species
+#-------------------------------
+ps.stats <- ps.nfix.coral.dna.norm  # perform stats on normalized file, with OTUs < 10x removed
+
+BC.dist = phyloseq::distance(ps.stats, method="bray", weighted=F)  #bray distance matrix
+disp.age = betadisper(BC.dist, sample_data(ps.stats)$Species)
+permutest(disp.age, pairwise=TRUE, permutations=1000)
+adonis(BC.dist ~ sample_data(ps.stats)$Species,permutations = 1000)
+#R2=0.20238, p=0.000999 ***
+
+#-------------------------------
+# Within species
+#-------------------------------
+#Pocillopora doesn't have any cluster I - III in tissue, so is excluded from skeleton/tissue test
+
+platyK.dna <- subset_samples(ps.nfix.coral.dna, Species2=="K_Platy")
+platyK.dna <- prune_taxa(taxa_sums(platyK.dna)>=1, platyK.dna)
+
+platyH.dna <- subset_samples(ps.nfix.coral.dna, Species2=="H_Platy")
+platyH.dna <- prune_taxa(taxa_sums(platyH.dna)>=1, platyH.dna)
+
+goni.dna <- subset_samples(ps.nfix.coral.dna, Species2=="H_Goni")
+goni.dna <- prune_taxa(taxa_sums(goni.dna)>=1, goni.dna)
+
+
+#Permanova Platygyra Kusu (4 tissue, 4 skeleton)
+ps.stats <- platyK.dna 
+BC.dist = phyloseq::distance(ps.stats, method="bray", weighted=F)  #bray distance matrix
+disp.age = betadisper(BC.dist, sample_data(ps.stats)$Type)
+permutest(disp.age, pairwise=TRUE, permutations=1000)
+adonis(BC.dist ~ sample_data(ps.stats)$SpeciesType,permutations = 1000)
+#R2=0.11259, p=0.8591
+
+#Permanova Platygyra Hantu (4 tissue, 4 skeleton)
+ps.stats <- platyH.dna 
+BC.dist = phyloseq::distance(ps.stats, method="bray", weighted=F)  #bray distance matrix
+disp.age = betadisper(BC.dist, sample_data(ps.stats)$Type)
+permutest(disp.age, pairwise=TRUE, permutations=1000)
+adonis(BC.dist ~ sample_data(ps.stats)$SpeciesType,permutations = 1000)
+#R2=0.10707, p=0.8062
+
+#Permanova Goniopora Hantu (3 tissue, 3 skeleton)
+ps.stats <- goni.dna 
+BC.dist = phyloseq::distance(ps.stats, method="bray", weighted=F)  #bray distance matrix
+disp.age = betadisper(BC.dist, sample_data(ps.stats)$Type)
+permutest(disp.age, pairwise=TRUE, permutations=1000)
+adonis(BC.dist ~ sample_data(ps.stats)$SpeciesType,permutations = 1000)
+#R2=0.12747, p=1
+
+#-------------------------------
+#  Calculations for Results 
+#-------------------------------
+
+#-Percentage of Gammaproteobacteria, Cyanobacteria, Deltaproteobacteria in cluster I-III nifH DNA
+gamma.cyano.delta <- subset_taxa(ps.nfix.coral.dna.norm, Class == "Gammaproteobacteria"| Phylum =="Cyanobacteria" | Class == "Deltaproteobacteria")
+nfix.sum<- ps.nfix.coral.dna.norm %>% taxa_sums(.)
+gcd.sum <- gamma.cyano.delta %>% taxa_sums(.)
+sum(gcd.sum)/sum(nfix.sum)*100
+#86.5% percent of cluster I-III is Gammaproteobacteria, Cyanobacteria, Deltaproteobacteria
+
+#-Percentage of Gammaproteobacteria, Cyanobacteria, Chloroflexi in cluster I-III nifH DNA
+gamma.cyano.chloroflex <- subset_taxa(ps.nfix.coral.dna.norm, Class == "Gammaproteobacteria"| Phylum =="Cyanobacteria" | Phylum == "Chloroflexi")
+nfix.sum<- ps.nfix.coral.dna.norm %>% taxa_sums(.)
+gcc.sum <- gamma.cyano.chloroflex %>% taxa_sums(.)
+sum(gcc.sum)/sum(nfix.sum)*100
+#58.2% percent of cluster I-III is Gammaproteobacteria, Cyanobacteria, Chloroflexi
+
+#-Percentage Cluster I-III in Platygyra Kusu
+platyK.dna <- subset_samples(ps.coral.dna.norm, Species2=="K_Platy")
+platyKclusterI_III <- platyK.dna%>% subset_taxa(Cluster !="Cluster V chL/bchL" & Cluster !="Cluster V chlX/bchX" & Cluster != "Cluster VI"  & Cluster != "Cluster IV" & Cluster != "unknown")
+platyKsum<- platyK.dna %>% taxa_sums(.)
+clusterI.IIIsum <- platyKclusterI_III %>% taxa_sums(.)
+sum(clusterI.IIIsum)/sum(platyKsum)*100
+# 14.2% Cluster I-III
+
+#-Percentage Cluster I-III in Platygyra Hantu
+platyH.dna <- subset_samples(ps.coral.dna.norm, Species2=="H_Platy")
+platyHclusterI_III <- platyH.dna%>% subset_taxa(Cluster !="Cluster V chL/bchL" & Cluster !="Cluster V chlX/bchX" & Cluster != "Cluster VI"  & Cluster != "Cluster IV" & Cluster != "unknown")
+platyHsum<- platyH.dna %>% taxa_sums(.)
+clusterI.IIIsum <- platyHclusterI_III %>% taxa_sums(.)
+sum(clusterI.IIIsum)/sum(platyHsum)*100
+# 21.0% Cluster I-III
+
+#-Percentage Cluster I-III in Platygyra Hantu
+pocilK.dna <- subset_samples(ps.coral.dna.norm, Species2=="K_Pocil")
+pocilKclusterI_III <- pocilK.dna%>% subset_taxa(Cluster !="Cluster V chL/bchL" & Cluster !="Cluster V chlX/bchX" & Cluster != "Cluster VI"  & Cluster != "Cluster IV" & Cluster != "unknown")
+pocilKsum<- pocilK.dna %>% taxa_sums(.)
+clusterI.IIIsum <- pocilKclusterI_III %>% taxa_sums(.)
+sum(clusterI.IIIsum)/sum(pocilKsum)*100
+# 0.46% Cluster I-III
+
+#-Percentage Cluster I in nifH RNA Cluster I-III
+rna.clusterI <- subset_taxa(ps.nfix.coral.rna.norm, Cluster == "Cluster I")
+rna.clusterI_III <- ps.nfix.coral.rna.norm
+rna.sum<- rna.clusterI_III %>% taxa_sums(.)
+rna.clusterI.sum <- rna.clusterI %>% taxa_sums(.)
+sum(rna.clusterI.sum)/sum(rna.sum)*100
+# Cluster I accounted for 81.1% of cluster I-III sequences in RNA
 
 
 
@@ -408,7 +529,7 @@ names(classPalette) = classList
 top <- names(sort(taxa_sums(ps.nfix.coral.norm), decreasing=TRUE))
 ps.top <- transform_sample_counts(ps.nfix.coral.norm, function(OTU) OTU/sum(OTU))
 ps.top <- prune_taxa(top, ps.top)
-sup.bar2 <- plot_bar(ps.top, fill="Class", x="Sample") + facet_wrap(NucleicType~Cluster, scales="free_x")+
+sup.bar2 <- plot_bar(ps.top, fill="Class", x="Bars3") + facet_wrap(NucleicType~Cluster, scales="free_x")+
   theme(legend.key.size = unit(0.9,"line"))  + theme(legend.position="bottom") +
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),

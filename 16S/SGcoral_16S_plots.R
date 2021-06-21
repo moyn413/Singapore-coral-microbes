@@ -1,5 +1,5 @@
 #----------------------------------------------------------------
-# 16S phyloseq processing file and script to make plots with 16S data. Starting file is a phyloseq file made using the dada2 pipeline.
+# 16S rRNA phyloseq processing file and script to make plots with 16S data. Starting file is a phyloseq file made using the dada2 pipeline.
 # Treemap, deseq, and normalization were based on scripts from https://github.com/slimelab/Singapore-metabarcodes
 #----------------------------------------------------------------
 library(plyr) 
@@ -89,10 +89,10 @@ ps.SW.LO <- prune_taxa(taxa_sums(ps.SW.LR)>10, ps.SW.LR)
 # Biostrings::writeXStringSet(seqs, str_c(treefasta_dir, "CORAL16S_ASV_SW_LO.fasta"), compress = FALSE, width = 20000)
 
 #Add Newick files made in Geneious Prime to phyloseq
-all.tree <- ape::read.tree("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/16S/16S_August_coral_SW_plus_wneg_new_silva/dada2/trees/phylo/ALL_16S_ASV_LO alignment FastTree Tree.newick")
-coral.dna.tree <- ape::read.tree("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/16S/16S_August_coral_SW_plus_wneg_new_silva/dada2/trees/phylo/CORAL16S_ASV_DNA_LO alignment FastTree Tree.newick")
-coral.rna.tree <- ape::read.tree("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/16S/16S_August_coral_SW_plus_wneg_new_silva/dada2/trees/phylo/CORAL16S_ASV_RNA_LO alignment FastTree Tree.newick")
-SW.tree <- ape::read.tree("/Users/molly/Dropbox/NitrogenFixation_Singapore/Molecular/SEQUENCING_RESULTS2020/16S/16S_August_coral_SW_plus_wneg_new_silva/dada2/trees/phylo/CORAL16S_ASV_SW_LO alignment FastTree Tree.newick")
+all.tree <- ape::read.tree("/GitHub/Singapore-coral-microbes/16S/phyloseq tree files/ALL_16S_ASV_LO alignment FastTree Tree.newick")
+coral.dna.tree <- ape::read.tree("/GitHub/Singapore-coral-microbes/16S/phyloseq tree files/CORAL16S_ASV_DNA_LO alignment FastTree Tree.newick")
+coral.rna.tree <- ape::read.tree("/GitHub/Singapore-coral-microbes/16S/phyloseq tree files/CORAL16S_ASV_RNA_LO alignment FastTree Tree.newick")
+SW.tree <- ape::read.tree("/GitHub/Singapore-coral-microbes/16S/phyloseq tree files/16S_August_coral_SW_plus_wneg_new_silva/dada2/trees/phylo/CORAL16S_ASV_SW_LO alignment FastTree Tree.newick")
 #------------------------------------------------------------------------------------------------
 
 
@@ -266,7 +266,7 @@ disp.age = betadisper(BC.dist, sample_data(ps.stats)$SpeciesType)
 permutest(disp.age, pairwise=TRUE, permutations=1000)
 # Test whether the skeleton and tissue differ significantly from each other using the permutational ANOVA (PERMANOVA) analysis:
 adonis(BC.dist ~ sample_data(ps.stats)$Type,permutations = 1000)
-
+# R2=0.40978 p=0.000999 ***
 
 
 #---------------------------------
@@ -280,6 +280,7 @@ disp.age = betadisper(BC.dist, sample_data(ps.stats)$SpeciesType)
 permutest(disp.age, pairwise=TRUE, permutations=1000)
 # Test whether the skeleton and tissue differ significantly from each other using the permutational ANOVA (PERMANOVA) analysis:
 adonis(BC.dist ~ sample_data(ps.stats)$Type,permutations = 1000)
+# R2=0.29924 p= 0.003996 **
 
 
 #---------------------------------
@@ -293,6 +294,7 @@ disp.age = betadisper(BC.dist, sample_data(ps.stats)$SpeciesType)
 permutest(disp.age, pairwise=TRUE, permutations=1000)
 # Test whether the skeleton and tissue differ significantly from each other using the permutational ANOVA (PERMANOVA) analysis:
 adonis(BC.dist ~ sample_data(ps.stats)$Type,permutations = 1000)
+# R2=0.30996 p=0.003996 **
 
 
 #---------------------------------
@@ -307,6 +309,7 @@ disp.age = betadisper(BC.dist, sample_data(ps.stats)$SpeciesType)
 permutest(disp.age, pairwise=TRUE, permutations=1000)
 # Test whether the skeleton and tissue differ significantly from each other using the permutational ANOVA (PERMANOVA) analysis:
 adonis(BC.dist ~ sample_data(ps.stats)$Type,permutations = 1000)
+# R2=0.37929 p=0.01499 *
 
 
 ##---------------------------------------------------------------------
@@ -329,6 +332,7 @@ BC.dist = phyloseq::distance(ps.stats, method="bray", weighted=F)  #bray distanc
 disp.age = betadisper(BC.dist, sample_data(ps.stats)$NucleicType)
 permutest(disp.age, pairwise=TRUE, permutations=1000)
 adonis(BC.dist ~ sample_data(ps.stats)$NucleicType,permutations = 1000)
+# R2=0.1268 p=0.02098 *
 
 #---------------------------------
 # Platygyra Kusu
@@ -340,7 +344,7 @@ BC.dist = phyloseq::distance(ps.stats, method="bray", weighted=F)  #bray distanc
 disp.age = betadisper(BC.dist, sample_data(ps.stats)$NucleicType)
 permutest(disp.age, pairwise=TRUE, permutations=1000)
 adonis(BC.dist ~ sample_data(ps.stats)$NucleicType,permutations = 1000)
-
+# R2=0.10616 p=0.02597 *
 
 #---------------------------------
 # Platygyra Hantu
@@ -352,7 +356,7 @@ BC.dist = phyloseq::distance(ps.stats, method="bray", weighted=F)  #bray distanc
 disp.age = betadisper(BC.dist, sample_data(ps.stats)$NucleicType)
 permutest(disp.age, pairwise=TRUE, permutations=1000)
 adonis(BC.dist ~ sample_data(ps.stats)$NucleicType,permutations = 1000)
-
+# R2=0.16313 p=0.000999 ***
 
 #---------------------------------
 # Goniopora
@@ -364,6 +368,32 @@ BC.dist = phyloseq::distance(ps.stats, method="bray", weighted=F)  #bray distanc
 disp.age = betadisper(BC.dist, sample_data(ps.stats)$NucleicType)
 permutest(disp.age, pairwise=TRUE, permutations=1000)
 adonis(BC.dist ~ sample_data(ps.stats)$NucleicType,permutations = 1000)
+# R2=0.26616 p=0.000999 ***
+
+
+
+
+#----------------------------#----------------------------
+# Percentages reported in Results 
+#----------------------------#----------------------------
+
+# Calculate percentages of difference groups to overall relative abundance 
+rhodobacterales <- subset_taxa(ps.coral.dna.norm, Order == "Rhodobacterales")%>% taxa_sums(.)
+rugeria <- subset_taxa(ps.coral.dna.norm, Genus == "Ruegeria")%>% taxa_sums(.)
+sum(rugeria)/sum(rhodobacterales)*100
+# Rugeria were 51.2% of Rhodobacterales in DNA based community
+
+cyanos <- subset_taxa(ps.coral.dna.norm, Phylum == "Cyanobacteria" )%>% taxa_sums(.)
+synechococcales <- subset_taxa(ps.coral.dna.norm, Order == "Synechococcales")%>% taxa_sums(.)
+sum(synechococcales)/sum(cyanos)*100
+# Synechococcales were 77.5% of Cyanobacteria in DNA based community
+
+
+rhodobacterales <- subset_taxa(ps.coral.rna.norm, Order == "Rhodobacterales")%>% taxa_sums(.)
+rugeria <- subset_taxa(ps.coral.rna.norm, Genus == "Ruegeria")%>% taxa_sums(.)
+sum(rugeria)/sum(rhodobacterales)*100
+# Rugeria were 17.9% of Rhodobacterales in DNA based community
+
 
 
 
@@ -560,7 +590,7 @@ rna.bar <- plot_bar(ps.top, fill="Order", x="Sample") + facet_wrap(~SpeciesType,
 #        width = 15, height = 10)
 
 ##---------------------------------------------------------------------
-# Figure S11. Seawater community 16S tree map
+# Figure S11. Seawater community 16S rRNA tree map
 ##---------------------------------------------------------------------
 
 # Define color palettes for Seawater
@@ -696,6 +726,7 @@ select.ratios.new <- unite(select.ratios, "Phylum_Class_Order", Phylum:Class:Ord
 select.ratios.new[select.ratios.new == Inf] <- NA #remove samples where not in DNA
 select.ratios.new[select.ratios.new == "NaN"] <- NA  #remove NaN samples
 select.ratios.new[select.ratios.new == 0] <- NA  #remove samples where not in RNA
+select.ratios.new <- na.omit(select.ratios.new) 
 
 #Average and standard error of OTU ratios, averaged by taxonomic Order, in each species/compartment/site
 avg.ratios <- select.ratios.new %>% group_by(Order,CoralType, Coral, Type,Phylum_Class_Order) %>% summarize(RNADNA=mean(Ratio,na.rm = TRUE), sd=sd(Ratio,na.rm = TRUE), n=n())
@@ -714,6 +745,67 @@ finalplot_log_revised <- ggplot(avg.ratios, aes(x= RNADNA, y= factor(Phylum_Clas
 #        width = 10,
 #        height = 9)
 
+
+#------------------------------------------#
+#-----RNA:DNA numbers in main text---------#
+#------------------------------------------#
+
+#Highest Cyanobacteria RNA:DNA
+cyanobacteria <-select.ratios.new %>% filter(Phylum == "Cyanobacteria")%>% filter(Ratio >500 )
+# RNA:DNA = 	 568.7 (otu0623), Synechococcales	Pseudanabaenaceae	MBIC10086
+
+#Goniopora Cyanobacteria
+select.ratios.new %>%  filter(Order=="Synechococcales") %>% filter(Coral =="Hantu Goniopora") %>% group_by(Type) %>% summarize(avgratio=mean(Ratio,na.rm = TRUE), sd=sd(Ratio,na.rm = TRUE), n=n())
+# Skeleton    0.350 0.411    3
+# Tissue      0.395 0.524    2
+
+#Cyanobactiera RNA:DNA in tissue and skeleton
+select.ratios.new%>%filter(Phylum=="Cyanobacteria") %>% group_by(Type) %>% summarize(avgratio=mean(Ratio,na.rm = TRUE), sd=sd(Ratio,na.rm = TRUE), n=n())
+# Skeleton    20.5   95.6    35
+# Tissue       4.70  10.0    55
+
+#Chloroflexi RNA:DNA in tissue and skeleton
+select.ratios.new%>%filter(Phylum=="Chloroflexi") %>% group_by(Type) %>% summarize(avgratio=mean(Ratio,na.rm = TRUE), sd=sd(Ratio,na.rm = TRUE), n=n())
+# Skeleton     8.21 31.3     34
+# Tissue       3.16  3.93    12
+
+#Desulfobacterota RNA:DNA in tissue and skeleton
+select.ratios.new%>%filter(Phylum=="Desulfobacterota") %>% group_by(Type) %>% summarize(avgratio=mean(Ratio,na.rm = TRUE), sd=sd(Ratio,na.rm = TRUE), n=n())
+# Skeleton     3.79  3.56    18
+# Tissue       5.92  9.61    20
+
+
+#Gammaproteobacteria in the tissue and skeleton
+select.ratios.new %>% filter(Type== "Skeleton") %>% filter(Class == "Gammaproteobacteria")%>% filter(Ratio >1 )%>%dim()
+#n =61
+select.ratios.new %>% filter(Type== "Tissue") %>% filter(Class == "Gammaproteobacteria")%>% filter(Ratio >1 )%>%dim()
+#n =207
+
+
+#Alphaproteobactiera with RNA:DNA 
+select.ratios.new %>% filter(Class == "Alphaproteobacteria")%>% filter(Ratio <1 )%>%dim()
+#n=316
+select.ratios.new  %>% filter(Class == "Alphaproteobacteria")%>% filter(Ratio >0)%>% dim()
+#n=462
+# Percentage of select Alphaproteobacteria with RNA:DNA <1 = 316/462 *100 = 68%
+
+#Rhodospirillales
+rhodospirillales <- select.ratios.new %>% filter(Order == "Rhodospirillales")%>% filter(Ratio >40)
+#highest Rhodospirillales RNA:DNA = 	43.8
+
+#Rhizobiales
+rhizobiales <- select.ratios.new %>% filter(Order == "Rhizobiales")%>% filter(Ratio >20)
+#Pseudoxanthobacter RNA:DNA = 	24.2 (otu0723), Methyloligellaceae RNA:DNA = 26.49 (otu0125) 
+
+#Oceanospirillales
+select.ratios.new%>%filter(Order=="Oceanospirillales") %>% group_by(Type) %>% summarize(avgratio=mean(Ratio,na.rm = TRUE), sd=sd(Ratio,na.rm = TRUE), n=n())
+# Skeleton     2.99  2.80   25
+# Tissue       3.52  4.26   91
+
+#Alteromonadales
+select.ratios.new%>%filter(Order=="Alteromonadales") %>% group_by(Type) %>% summarize(avgratio=mean(Ratio,na.rm = TRUE), sd=sd(Ratio,na.rm = TRUE), n=n())
+# Skeleton     7.19  20.6    42
+# Tissue       2.34  2.96   156
 
 
 

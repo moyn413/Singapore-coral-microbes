@@ -127,24 +127,24 @@ ps.coral.nosym.LO <- subset_taxa(ps.coral.all.LO, Genus != "Symbiodinium"| is.na
 # Alpha diversity stats
 #--------------------------------
 
-# Perform stats on all samples, not normalized, not trimmed. Use this for stats table
+# Perform stats on all samples, not normalized, not trimmed (LR files)
 physeq2 = transform_sample_counts(ps.all.LR, ceiling)
 rich = estimate_richness(physeq2)
 plot_richness(ps.all, measures=c("Shannon", "Simpson"), x="SpeciesType", color="Type") + geom_boxplot()
 
 # DNA tissue vs skeleton 
-plot_richness(ps.coral.dna.LR.norm, measures=c("Shannon", "Simpson"), x="SpeciesType", color="Type") + geom_boxplot()
-rich = estimate_richness(ps.coral.dna.LR.norm, measures=c("Shannon", "Simpson"))
+plot_richness(ps.coral.dna.LR, measures=c("Shannon", "Simpson"), x="SpeciesType", color="Type") + geom_boxplot()
+rich = estimate_richness(ps.coral.dna.LR, measures=c("Shannon", "Simpson"))
 # Shannon stats, Wilcoxon rank sum test and t.test
-t.test(rich$Shannon~ sample_data(ps.coral.dna.LR.norm)$Type)
-
+t.test(rich$Shannon~ sample_data(ps.coral.dna.LR)$Type)
+#p=0.7625
 
 # RNA tissue vs skeleton 
-plot_richness(ps.coral.rna.LR.norm, measures=c("Shannon", "Simpson"), x="SpeciesType2", color="Type2") + geom_boxplot()
-rich = estimate_richness(ps.coral.rna.LR.norm, measures=c("Shannon", "Simpson"))
+plot_richness(ps.coral.rna.LR, measures=c("Shannon", "Simpson"), x="SpeciesType2", color="Type2") + geom_boxplot()
+rich = estimate_richness(ps.coral.rna.LR, measures=c("Shannon", "Simpson"))
 # Shannon stats, Wilcoxon rank sum test and t.test
-t.test(rich$Shannon~ sample_data(ps.coral.rna.LR.norm)$Type)
-
+t.test(rich$Shannon~ sample_data(ps.coral.rna.LR)$Type)
+#p=0.01
 
 #--------------------------------
 # PERMANOVA
@@ -157,7 +157,7 @@ BC.dist = phyloseq::distance(ps.stats, method="bray", weighted=F)  #bray distanc
 disp.age = betadisper(BC.dist, sample_data(ps.stats)$Species2)
 permutest(disp.age, pairwise=TRUE, permutations=1000)
 adonis(BC.dist ~ sample_data(ps.stats)$Species,permutations = 1000)
-
+#R2=0.66046, p=0.000999 ***
 
 
 ##---------------------------------------------------------------------
@@ -166,10 +166,10 @@ adonis(BC.dist ~ sample_data(ps.stats)$Species,permutations = 1000)
 
 
 ##---------------------------------------------------------------------
-# Figure S8. Symbiodinium relative abundance
+# Figure S8. Symbiodiniaceae relative abundance
 ##---------------------------------------------------------------------
 
-getPalette = colorRampPalette(c(brewer.pal(8, "Dark2"), brewer.pal(12, "Paired"), brewer.pal(8, "Set1"))) 
+getPalette = colorRampPalette(c(brewer.pal(12, "Paired"), brewer.pal(8, "Set1"), brewer.pal(8, "Pastel2"), brewer.pal(8, "Accent"))) 
 genusList = unique(tax_table(ps.coral.all.abund)[,"Species"])
 genusPalette = getPalette(length(genusList))
 names(genusPalette) = genusList
@@ -177,7 +177,7 @@ names(genusPalette) = genusList
 
 # Symbiodinium relative abundance bar plot by genus
 coral.tissue <- subset_samples(ps.coral.all.abund, Type2 == "Tissue")
-top_c <- names(sort(taxa_sums(coral.tissue), decreasing=TRUE))[1:200]
+top_c <- names(sort(taxa_sums(coral.tissue), decreasing=TRUE))[1:100]
 ps.top_c <- transform_sample_counts(coral.tissue, function(OTU) OTU/sum(OTU))
 ps.top_c <- prune_taxa(top_c , ps.top_c)
 genus <- plot_bar(ps.top_c, fill="Species", x="Name") + facet_wrap(~Type, 2, scales="free_x")+
@@ -188,16 +188,16 @@ genus <- plot_bar(ps.top_c, fill="Species", x="Name") + facet_wrap(~Type, 2, sca
         panel.border = element_blank(),
         panel.background = element_blank()) + scale_color_manual(values=genusPalette) + scale_fill_manual(values= genusPalette)
 
-
-# ggsave("18S_coral.pdf", plot = genus, path = "/path",
-#        width = 10,
-#        height = 7)
+# 
+# ggsave("18S_coral_tissue.pdf", plot = genus, path = "/path",
+#        width = 7,
+#        height = 15)
 
 
 
 
 ##---------------------------------------------------------------------
-# Figure S9. 18S Principal coordinates analysis
+# Figure S9. 18S rRNA Principal coordinates analysis
 ##---------------------------------------------------------------------
 
 logt  = transform_sample_counts(ps.coral.all.norm, function(x) log(1 + x) )
@@ -216,7 +216,7 @@ pcoa.plot1
 
 
 ##---------------------------------------------------------------------
-# Figure S10. 18S tree maps with no Symbiodinium
+# Figure S10. 18S rRNA tree maps with no Symbiodiniaceae
 ##---------------------------------------------------------------------
 
 
@@ -253,7 +253,7 @@ treemap_gg_dv2 <- function(df, group1, group2, title, c.palette) {
     treemapify::geom_treemap_subgroup_text(place = "centre", grow = T, alpha = 0.5, colour =
                                              "white", fontface = "italic", min.size = 0) +
     scale_fill_manual(values=c.palette) +
-    theme(legend.position="bottom", plot.title = element_text(size = 16, face = "bold")) #Change legend position to "bottom" for legend
+    theme(legend.position="none", plot.title = element_text(size = 16, face = "bold")) #Change legend position to "bottom" for legend
   print(g_treemap)
   return(g_treemap)
 }
@@ -304,7 +304,7 @@ x.order <-grid.arrange(dna.tissue.tree.order, dna.skeleton.tree.order, rna.tissu
 
 
 ##---------------------------------------------------------------------
-# Figure S12b. Seawater 18S treemaps
+# Figure S12b. Seawater 18S rRNA treemaps
 ##---------------------------------------------------------------------
 
 
