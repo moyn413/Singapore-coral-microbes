@@ -193,7 +193,7 @@ genus <- plot_bar(ps.top_c, fill="Species", x="Name") + facet_wrap(~Type, 2, sca
 #        width = 7,
 #        height = 15)
 
-
+#Note that upon alignment and analysis of Clade D and E ASVs with reference sequences, these Clades D/E cannot be distinguished using the 18S rRNA region sequenced here.
 
 
 ##---------------------------------------------------------------------
