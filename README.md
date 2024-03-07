@@ -2,7 +2,7 @@
 
 Script and data for: 
 
-Moynihan, M.A., Goodkin, N.F., Morgan, K.M., Kho, P.Y.Y, Lopes dos Santos, A., Lauro, F.M., Baker, D.M, and Martin, P. Coral-associated nitrogen fixation rates and diazotrophic diversity on a nutrient-replete equatorial reef. (in revision)
+Moynihan, M.A., Goodkin, N.F., Morgan, K.M., Kho, P.Y.Y, Lopes dos Santos, A., Lauro, F.M., Baker, D.M, and Martin, P. Coral-associated nitrogen fixation rates and diazotrophic diversity on a nutrient-replete equatorial reef. The ISME Journal, Volume 16, Issue 1, January 2022, Pages 233–246, https://doi.org/10.1038/s41396-021-01054-1
 
 ## Directories
 
